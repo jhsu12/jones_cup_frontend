@@ -1,0 +1,396 @@
+{
+    "id": 11892,
+    "orgId": 7,
+    "name": "\u5df4\u6797",
+    "altName": "",
+    "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638",
+    "rosters": [
+        {
+            "id": 160669,
+            "personalInfo": {
+                "name": "Mohamed Qamber",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "0",
+            "position": "PowerForward"
+        },
+        {
+            "id": 160670,
+            "personalInfo": {
+                "name": "Mahmood Khalifa",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "0",
+            "position": "ShootingGuard"
+        },
+        {
+            "id": 160657,
+            "personalInfo": {
+                "name": "Mohamed Buallay",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "1",
+            "position": "SmallForward"
+        },
+        {
+            "id": 160658,
+            "personalInfo": {
+                "name": "Devon Chism",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "2",
+            "position": "SmallForward"
+        },
+        {
+            "id": 160659,
+            "personalInfo": {
+                "name": "Ahmed Haji",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "3",
+            "position": "Center"
+        },
+        {
+            "id": 160660,
+            "personalInfo": {
+                "name": "Ali Rashed",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "6",
+            "position": "PointGuard"
+        },
+        {
+            "id": 160661,
+            "personalInfo": {
+                "name": "Abdulqader Mohamed",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "7",
+            "position": "Center"
+        },
+        {
+            "id": 160662,
+            "personalInfo": {
+                "name": "Subah Azzam",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "10",
+            "position": "PowerForward"
+        },
+        {
+            "id": 160663,
+            "personalInfo": {
+                "name": "Mustafa Rashed",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "11",
+            "position": "PointGuard"
+        },
+        {
+            "id": 160664,
+            "personalInfo": {
+                "name": "Ali Alhaddad",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "17",
+            "position": "Center"
+        },
+        {
+            "id": 160665,
+            "personalInfo": {
+                "name": "Mohamed Hamoda",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "23",
+            "position": "SmallForward"
+        },
+        {
+            "id": 160666,
+            "personalInfo": {
+                "name": "Murtadha Ismaeel",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "25",
+            "position": "Center"
+        },
+        {
+            "id": 160667,
+            "personalInfo": {
+                "name": "Jakarr Sampson",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "32",
+            "position": "SmallForward"
+        },
+        {
+            "id": 160668,
+            "personalInfo": {
+                "name": "Ahmed Bindayneh",
+                "avatarUrl": ""
+            },
+            "jerseyNumber": "77",
+            "position": "Center"
+        }
+    ],
+    "event": {
+        "id": 416,
+        "name": "MEN",
+        "season": {
+            "id": 169,
+            "name": "44th"
+        }
+    },
+    "team": {
+        "squads": [
+            {
+                "id": 11892,
+                "event": {
+                    "id": 416,
+                    "name": "MEN",
+                    "season": {
+                        "id": 169,
+                        "name": "44th"
+                    }
+                }
+            }
+        ]
+    },
+    "matches": [
+        {
+            "id": 7991,
+            "leagueId": 27,
+            "matchedAt": "2025-07-15T05:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "13",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "awaySquad": {
+                "id": 11893,
+                "name": "\u6fb3\u6d32\u806f\u968a",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/c2be655be99db096194132a6f3f509afcc98e3a38f48a3295ccd0002cf2fa6c9"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 8000,
+            "leagueId": 27,
+            "matchedAt": "2025-07-17T07:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "22",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "awaySquad": {
+                "id": 11895,
+                "name": "\u5361\u9054",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/2f0c8819aa1079e1f1d6ee18132895d4d6f9015e211493ec5a28170868a6488d"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 8006,
+            "leagueId": 27,
+            "matchedAt": "2025-07-18T11:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "28",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11887,
+                "name": "\u4e2d\u83ef\u85cd",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/cdd5dbcf6e4e40d3c6fa1dc556ec4b78e4cabfbb4dfddd80a05990bdaea9b42b"
+            },
+            "awaySquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 8008,
+            "leagueId": 27,
+            "matchedAt": "2025-07-19T07:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "30",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "awaySquad": {
+                "id": 11890,
+                "name": "\u83f2\u5f8b\u8cd3",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/59445c05ff185a165e70069300f442992b97e84dc2f0ecb3ba1e99c186be8640"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 7995,
+            "leagueId": 27,
+            "matchedAt": "2025-07-16T05:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "17",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11894,
+                "name": "\u963f\u806f",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/13eb5275ca875e49f8dda02f76402aa9dfe9ae6688592ad723caea963753d1b9"
+            },
+            "awaySquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 7979,
+            "leagueId": 27,
+            "matchedAt": "2025-07-12T05:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "1",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11889,
+                "name": "\u65e5\u672c",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/9e78de903e7fdb8b2458011575cdd087b600fcac61ac94dbca3642f7b4f7f8e9"
+            },
+            "awaySquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 7985,
+            "leagueId": 27,
+            "matchedAt": "2025-07-13T09:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "7",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "awaySquad": {
+                "id": 11888,
+                "name": "\u4e2d\u83ef\u767d",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/0df9d4e477d5b36e850a3eee067e59cd1aa4f728dc306710c8c0384c05f392f3"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        },
+        {
+            "id": 7987,
+            "leagueId": 27,
+            "matchedAt": "2025-07-14T05:00:00.000Z",
+            "venue": "\u65b0\u838a\u9ad4\u80b2\u9928",
+            "court": "",
+            "status": "NOT_STARTED",
+            "code": "9",
+            "round": 0,
+            "sportName": "Basketball",
+            "division": {
+                "name": "\u5faa\u74b0\u8cfd(\u7537\u5b50\u7d44)"
+            },
+            "homeSquad": {
+                "id": 11891,
+                "name": "\u99ac\u4f86\u897f\u4e9e",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/77d205fbb24fc25fa28c1a5b791575eea3ab193438790dbb1ad46c01177a5c00"
+            },
+            "awaySquad": {
+                "id": 11892,
+                "name": "\u5df4\u6797",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            "homeSquadScore": 0,
+            "awaySquadScore": 0,
+            "calculated": false
+        }
+    ],
+    "stat": {
+        "average_stat": {},
+        "accumulated_stat": {}
+    }
+}

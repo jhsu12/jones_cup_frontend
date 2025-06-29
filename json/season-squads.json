@@ -1,0 +1,104 @@
+[
+    {
+        "name": "MEN",
+        "id": 416,
+        "squads": [
+            {
+                "id": 11887,
+                "name": "中華藍",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/cdd5dbcf6e4e40d3c6fa1dc556ec4b78e4cabfbb4dfddd80a05990bdaea9b42b"
+            },
+            {
+                "id": 11888,
+                "name": "中華白",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/0df9d4e477d5b36e850a3eee067e59cd1aa4f728dc306710c8c0384c05f392f3"
+            },
+            {
+                "id": 11889,
+                "name": "日本",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/9e78de903e7fdb8b2458011575cdd087b600fcac61ac94dbca3642f7b4f7f8e9"
+            },
+            {
+                "id": 11893,
+                "name": "澳洲聯隊",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/c2be655be99db096194132a6f3f509afcc98e3a38f48a3295ccd0002cf2fa6c9"
+            },
+            {
+                "id": 11890,
+                "name": "菲律賓",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/59445c05ff185a165e70069300f442992b97e84dc2f0ecb3ba1e99c186be8640"
+            },
+            {
+                "id": 11892,
+                "name": "巴林",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/e44a05ba7f7d8fc0f4df8185091498cde56313f3a96bb83341075426b137d638"
+            },
+            {
+                "id": 11891,
+                "name": "馬來西亞",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/77d205fbb24fc25fa28c1a5b791575eea3ab193438790dbb1ad46c01177a5c00"
+            },
+            {
+                "id": 11895,
+                "name": "卡達",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/2f0c8819aa1079e1f1d6ee18132895d4d6f9015e211493ec5a28170868a6488d"
+            },
+            {
+                "id": 11894,
+                "name": "阿聯",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/13eb5275ca875e49f8dda02f76402aa9dfe9ae6688592ad723caea963753d1b9"
+            }
+        ]
+    },
+    {
+        "name": "WOMEN",
+        "id": 417,
+        "squads": [
+            {
+                "id": 11374,
+                "name": "中華隊",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/cdd5dbcf6e4e40d3c6fa1dc556ec4b78e4cabfbb4dfddd80a05990bdaea9b42b"
+            },
+            {
+                "id": 11375,
+                "name": "世大運培訓隊",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/b019ed4e5a15db79c49f8d623fb12ad14693377560235f54366a214ef16ec7b5"
+            },
+            {
+                "id": 11376,
+                "name": "日本",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/9e78de903e7fdb8b2458011575cdd087b600fcac61ac94dbca3642f7b4f7f8e9"
+            },
+            {
+                "id": 11377,
+                "name": "韓國",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/d8c35320ae26ede7e2650a0796fff6d6953f9ade0248f611c83026ffc279a25d"
+            },
+            {
+                "id": 11378,
+                "name": "菲律賓",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/59445c05ff185a165e70069300f442992b97e84dc2f0ecb3ba1e99c186be8640"
+            },
+            {
+                "id": 11379,
+                "name": "泰國",
+                "altName": "",
+                "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/66c8691d2debaaeabd22fe90dd73ca5da9033778ad0e98048e366118bae57ba2"
+            }
+        ]
+    }
+]
