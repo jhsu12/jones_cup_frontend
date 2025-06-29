@@ -1,0 +1,132 @@
+:root {
+    --bg-color: #1a1d21;
+    --card-color: #25282e;
+    --font-color: #e1e1e1;
+    --font-color-secondary: #8c8f94;
+    --border-color: #3a3f47;
+    --team1-color: #00a9ff;
+    --team2-color: #ff7a00;
+    --highlight-color: #ffffff;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+header.global-filters {
+    background-color: var(--card-color);
+    padding: 15px 25px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+header.global-filters h1 {
+    margin: 0;
+    font-size: 1.5em;
+    margin-right: auto;
+}
+
+.filter-group label {
+    font-size: 0.9em;
+    color: var(--font-color-secondary);
+    margin-right: 8px;
+}
+
+.filter-group select {
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 1em;
+}
+
+nav.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--font-color-secondary);
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-button.active, .tab-button:hover {
+    color: var(--font-color);
+    border-bottom: 3px solid var(--team1-color);
+}
+
+.content {
+    background-color: var(--card-color);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.chart-container {
+    display: none;
+}
+
+.chart-container.active {
+    display: block;
+}
+
+h2 {
+    color: var(--font-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+/* D3 Chart Styles */
+.axis path, .axis line {
+    stroke: var(--border-color);
+}
+
+.axis text {
+    fill: var(--font-color-secondary);
+}
+
+.quadrant-line {
+    stroke: var(--border-color);
+    stroke-width: 2px;
+    stroke-dasharray: 4;
+}
+
+/* Tooltip */
+#tooltip {
+    position: absolute;
+    opacity: 0;
+    background-color: #111;
+    border: 1px solid var(--highlight-color);
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+    font-size: 0.9em;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}

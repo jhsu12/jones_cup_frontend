@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Coach's Playbook: Scouting with the Box Score</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- 
+    Narrative & Structure Plan:
+    1. Introduction: Hook the user with the concept of "scouting beyond the score."
+    2. Phase 1 - Team Blueprint: Visualize the team's core identity. Use a big number for Pace and a Radar chart for the Four Factors to show the team's overall profile.
+    3. Phase 2 - Player Roles: Break down individual player contributions. Use Bar charts for Usage (USG%) vs. Efficiency (TS%) and Stacked Bar charts to show player archetypes (Slasher, Specialist, Operator) through shot distribution.
+    4. Phase 3 - Game Plan Synthesis: Show how data translates to strategy. Use a structured HTML/CSS flow diagram for the defensive game plan.
+    5. Conclusion: Summarize the key takeaways of a data-driven approach.
+
+    Visualization Choices & Justification (NO SVG / NO Mermaid JS):
+    - Pace: Goal: Inform. Chosen: Single Big Number. Justification: Instantly conveys the game's tempo. Method: HTML/Tailwind.
+    - Four Factors: Goal: Compare. Chosen: Radar Chart. Justification: Perfect for comparing multiple metrics (offense vs. defense) on a single axis, showing a team's "shape." Library: Chart.js (Canvas).
+    - Player Engine (USG% vs TS%): Goal: Compare. Chosen: Bar Chart. Justification: Clearly compares the workload vs. efficiency of key players. Library: Chart.js (Canvas).
+    - Player Style (Shot Distribution): Goal: Compare Composition. Chosen: Stacked Bar Chart. Justification: Best way to show the proportion of 2PA, 3PA, and FTA that make up a player's style. Library: Chart.js (Canvas).
+    - Game Plan Flow: Goal: Organize. Chosen: Flow Chart. Justification: Visually represents the decision-making process for defensive assignments. Method: HTML/CSS with Tailwind (NO SVG/Mermaid).
+
+    Color Palette Chosen: Brilliant Blues (#003F5C, #2F4B7C, #665191, #A05195, #D45087, #F95D6A, #FF7C43, #FFA600)
+    
+    Confirmation: No SVG graphics or Mermaid JS were used in this document. All charts are rendered on Canvas by Chart.js, and diagrams are built with HTML and Tailwind CSS.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-arrow {
+            position: relative;
+            padding-right: 2rem;
+        }
+        .flow-arrow::after {
+            content: '→';
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #FFA600;
+        }
+        .flow-arrow-down {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+        .flow-arrow-down::after {
+            content: '↓';
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #FFA600;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-4xl md:text-6xl font-black text-[#003F5C] tracking-tight">THE COACH'S PLAYBOOK</h1>
+            <p class="text-lg md:text-xl text-[#2F4B7C] mt-2">Scouting the Opposition with the Traditional Box Score</p>
+        </header>
+
+        <section id="phase1" class="mb-12 md:mb-20">
+            <h2 class="text-3xl font-bold text-center text-[#003F5C] mb-2">Phase 1: The Team Blueprint</h2>
+            <p class="text-center text-lg text-gray-600 mb-8 max-w-3xl mx-auto">First, we diagnose the opponent's core identity. Are they a high-speed "track meet" team or a methodical "street fight" team? This is revealed by their Pace and the Four Factors of success.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-1 bg-white rounded-lg shadow-lg p-6 flex flex-col justify-center items-center text-center">
+                    <h3 class="text-2xl font-bold text-[#2F4B7C] mb-2">Game Tempo</h3>
+                    <p class="text-9xl font-black text-[#FFA600]">94.0</p>
+                    <p class="text-xl text-gray-600 font-semibold">Pace (Possessions per 48 min)</p>
+                    <p class="mt-4 text-gray-500">This team wants a slow, half-court game. Every possession is critical, and they won't beat themselves with unforced errors. The entire game will be a strategic grind.</p>
+                </div>
+                
+                <div class="md:col-span-2 bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-2xl font-bold text-[#2F4B7C] text-center mb-4">The Four Factors Profile</h3>
+                    <div class="chart-container">
+                        <canvas id="fourFactorsChart"></canvas>
+                    </div>
+                     <p class="mt-4 text-gray-500 text-center">This radar chart visualizes the team's strengths and weaknesses. They are an elite shooting and rebounding team but struggle to force turnovers on defense. This confirms their identity as a methodical, half-court focused team.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="phase2" class="mb-12 md:mb-20">
+            <h2 class="text-3xl font-bold text-center text-[#003F5C] mb-2">Phase 2: Individual Player Roles</h2>
+            <p class="text-center text-lg text-gray-600 mb-8 max-w-3xl mx-auto">Next, we move from the team to the players who drive it. By analyzing individual stats, we can identify the offensive engine, measure their efficiency, and uncover their preferred style of play.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-2xl font-bold text-[#665191] text-center mb-4">The Offensive Engine</h3>
+                    <div class="chart-container h-80">
+                        <canvas id="playerEngineChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-gray-500">Player A is the clear offensive engine, using over 30% of possessions. Crucially, his True Shooting % is elite, meaning he is both high-volume and highly efficient. Player B is a secondary option, while Player C is purely a role player.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-2xl font-bold text-[#665191] text-center mb-4">Uncovering Player Style</h3>
+                     <div class="chart-container h-80">
+                        <canvas id="playerStyleChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-gray-500">Shot distribution reveals how they score. Player A is a balanced "Operator." Player D is a "Slasher" who lives at the rim and the free-throw line. Player E is a "Specialist" who almost exclusively shoots threes.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="phase3">
+            <h2 class="text-3xl font-bold text-center text-[#003F5C] mb-2">Phase 3: The Game Plan Synthesis</h2>
+            <p class="text-center text-lg text-gray-600 mb-8 max-w-3xl mx-auto">Finally, we translate data into action. This defensive game plan is built directly from the statistical profiles we've uncovered, designed to exploit weaknesses and neutralize strengths.</p>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-[#A05195] text-center mb-6">Defensive Decision Flowchart</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    
+                    <div class="text-center p-4 bg-gray-100 rounded-lg border-2 border-[#D45087]">
+                        <p class="font-bold text-lg">Who has the ball?</p>
+                    </div>
+
+                    <div class="hidden md:block flow-arrow"></div>
+                    <div class="md:hidden flow-arrow-down"></div>
+
+                    <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+                        <div class="text-center p-4 bg-blue-100 rounded-lg shadow">
+                            <p class="font-bold text-lg text-blue-800">Player A (Operator)</p>
+                            <p class="text-blue-700">Force him off the 3pt line, but stay home on his drives. Live with a contested mid-range jumper.</p>
+                        </div>
+                        <div class="text-center p-4 bg-red-100 rounded-lg shadow">
+                            <p class="font-bold text-lg text-red-800">Player D (Slasher)</p>
+                            <p class="text-red-700">Pack the paint and build a wall. Do not let him get to the rim. Force him to shoot over the top.</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-100 rounded-lg shadow">
+                            <p class="font-bold text-lg text-green-800">Player E (Specialist)</p>
+                            <p class="text-green-700">Chase him off every screen. Do NOT leave him to help. Make him put the ball on the floor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const brilliantBlues = ['#003F5C', '#665191', '#D45087', '#FFA600'];
+        const brilliantBluesTransparent = ['rgba(0, 63, 92, 0.6)', 'rgba(102, 81, 145, 0.6)', 'rgba(212, 80, 135, 0.6)', 'rgba(255, 166, 0, 0.6)'];
+
+        function wrapLabels(label) {
+            const maxLen = 16;
+            if (typeof label === 'string' && label.length > maxLen) {
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + word).length > maxLen) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word + ' ';
+                }
+                lines.push(currentLine.trim());
+                return lines;
+            }
+            return label;
+        }
+        
+        const sharedTooltipOptions = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+        const fourFactorsData = {
+            labels: ['Shooting (eFG%)', 'Turnovers (TOV%)', 'Rebounding (ORB%)', ['Free Throws', '(FT Rate)']],
+            datasets: [{
+                label: 'Opponent Offense',
+                data: [75, 85, 80, 40],
+                backgroundColor: brilliantBluesTransparent[1],
+                borderColor: brilliantBlues[1],
+                borderWidth: 2,
+                pointBackgroundColor: brilliantBlues[1],
+            }, {
+                label: 'Opponent Defense',
+                data: [45, 30, 60, 25],
+                backgroundColor: brilliantBluesTransparent[2],
+                borderColor: brilliantBlues[2],
+                borderWidth: 2,
+                pointBackgroundColor: brilliantBlues[2],
+            }]
+        };
+
+        new Chart(document.getElementById('fourFactorsChart'), {
+            type: 'radar',
+            data: fourFactorsData,
+            options: {
+                ...sharedTooltipOptions,
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                        pointLabels: { font: { size: 12 } },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    ...sharedTooltipOptions.plugins,
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+
+        const playerEngineData = {
+            labels: ['Player A', 'Player B', 'Player C'],
+            datasets: [{
+                label: 'Usage Rate (USG%)',
+                data: [31.6, 22.1, 14.5],
+                backgroundColor: brilliantBlues[0],
+            }, {
+                label: 'True Shooting (TS%)',
+                data: [61.2, 55.4, 58.9],
+                backgroundColor: brilliantBlues[3],
+            }]
+        };
+
+        new Chart(document.getElementById('playerEngineChart'), {
+            type: 'bar',
+            data: playerEngineData,
+            options: {
+                ...sharedTooltipOptions,
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return value + '%' }
+                        }
+                    }
+                },
+                plugins: {
+                     ...sharedTooltipOptions.plugins,
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+
+        const playerStyleData = {
+            labels: ['Player A (Operator)', 'Player D (Slasher)', 'Player E (Specialist)'].map(wrapLabels),
+            datasets: [{
+                label: '2PA %',
+                data: [55, 65, 15],
+                backgroundColor: brilliantBlues[0],
+            }, {
+                label: '3PA %',
+                data: [30, 10, 80],
+                backgroundColor: brilliantBlues[1],
+            }, {
+                label: 'FTA %',
+                data: [15, 25, 5],
+                backgroundColor: brilliantBlues[2],
+            }]
+        };
+
+        new Chart(document.getElementById('playerStyleChart'), {
+            type: 'bar',
+            data: playerStyleData,
+            options: {
+                ...sharedTooltipOptions,
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            callback: function(value) { return value + '%' }
+                        }
+                    }
+                },
+                plugins: {
+                    ...sharedTooltipOptions.plugins,
+                    legend: {
+                        position: 'top',
+                    },
+                     tooltip: {
+                         ...sharedTooltipOptions.plugins.tooltip,
+                        callbacks: {
+                            ...sharedTooltipOptions.plugins.tooltip.callbacks,
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                indexAxis: 'y',
+            }
+        });
+
+    </script>
+</body>
+</html>
