@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Interactive Scouting Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8;
+            color: #1a202c;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: #2D3748;
+            color: #fff;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #A0AEC0;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            fill: #4A5568;
+        }
+        .grid path,
+        .grid line {
+            fill: none;
+            stroke: #E2E8F0;
+            shape-rendering: crispEdges;
+        }
+        .control-label {
+            color: #003F5C;
+            font-weight: 600;
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-[#003F5C]">Interactive Player Performance Explorer</h1>
+            <p class="text-lg text-[#2F4B7C] mt-1">Use the filters to analyze relationships between player stats.</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 border border-gray-200 rounded-lg">
+                <div>
+                    <label for="view-filter" class="block text-sm control-label mb-1">Data View</label>
+                    <select id="view-filter" class="block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-[#FFA600] focus:border-[#FFA600]">
+                        <option value="game">Per Game</option>
+                        <option value="average">Average</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="team-filter" class="block text-sm control-label mb-1">Team</label>
+                    <select id="team-filter" class="block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-[#FFA600] focus:border-[#FFA600]">
+                        <option value="All">All Teams</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="player-filter" class="block text-sm control-label mb-1">Player</label>
+                    <select id="player-filter" class="block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-[#FFA600] focus:border-[#FFA600]">
+                        <option value="All">All Players</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="x-axis-select" class="block text-sm control-label mb-1">X-Axis</label>
+                    <select id="x-axis-select" class="block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-[#FFA600] focus:border-[#FFA600]"></select>
+                </div>
+                <div>
+                    <label for="y-axis-select" class="block text-sm control-label mb-1">Y-Axis</label>
+                    <select id="y-axis-select" class="block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-[#FFA600] focus:border-[#FFA600]"></select>
+                </div>
+            </div>
+
+            <div id="chart-area" class="w-full"></div>
+        </div>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        const mockData = [
+            { game: 1, team: 'Vipers', player: 'Player A', pos: 'G', min: 35, pts: 28, reb: 5, ast: 7, fga: 20, fgm: 11, fta: 5, ftm: 5, "3pa": 7, "3pm": 1, tov: 3 },
+            { game: 1, team: 'Vipers', player: 'Player B', pos: 'G', min: 32, pts: 15, reb: 3, ast: 4, fga: 12, fgm: 6, fta: 2, ftm: 2, "3pa": 6, "3pm": 1, tov: 2 },
+            { game: 1, team: 'Vipers', player: 'Player C', pos: 'F', min: 28, pts: 10, reb: 12, ast: 1, fga: 8, fgm: 4, fta: 2, ftm: 2, "3pa": 0, "3pm": 0, tov: 1 },
+            { game: 1, team: 'Titans', player: 'Player D', pos: 'G', min: 38, pts: 32, reb: 6, ast: 9, fga: 22, fgm: 12, fta: 8, ftm: 6, "3pa": 8, "3pm": 2, tov: 4 },
+            { game: 1, team: 'Titans', player: 'Player E', pos: 'F', min: 30, pts: 18, reb: 4, ast: 2, fga: 15, fgm: 6, fta: 3, ftm: 3, "3pa": 9, "3pm": 3, tov: 1 },
+            { game: 2, team: 'Vipers', player: 'Player A', pos: 'G', min: 37, pts: 35, reb: 6, ast: 8, fga: 25, fgm: 13, fta: 7, ftm: 6, "3pa": 8, "3pm": 3, tov: 2 },
+            { game: 2, team: 'Vipers', player: 'Player B', pos: 'G', min: 29, pts: 12, reb: 2, ast: 6, fga: 10, fgm: 4, fta: 4, ftm: 4, "3pa": 5, "3pm": 0, tov: 3 },
+            { game: 2, team: 'Vipers', player: 'Player C', pos: 'F', min: 30, pts: 8, reb: 14, ast: 0, fga: 7, fgm: 3, fta: 3, ftm: 2, "3pa": 0, "3pm": 0, tov: 1 },
+            { game: 2, team: 'Titans', player: 'Player D', pos: 'G', min: 36, pts: 25, reb: 5, ast: 11, fga: 19, fgm: 9, fta: 6, ftm: 5, "3pa": 7, "3pm": 2, tov: 3 },
+            { game: 2, team: 'Titans', player: 'Player E', pos: 'F', min: 33, pts: 22, reb: 5, ast: 3, fga: 18, fgm: 8, fta: 4, ftm: 2, "3pa": 12, "3pm": 4, tov: 2 },
+        ];
+        
+        function calculateDerivedStats(data) {
+            return data.map(d => {
+                const teamGame = mockData.filter(g => g.team === d.team && g.game === d.game);
+                const teamTotals = {
+                    fga: d3.sum(teamGame, p => p.fga),
+                    fta: d3.sum(teamGame, p => p.fta),
+                    tov: d3.sum(teamGame, p => p.tov),
+                    min: 240,
+                };
+                
+                const playerPossUsed = d.fga + (0.44 * d.fta) + d.tov;
+                const teamPoss = teamTotals.fga + (0.44 * teamTotals.fta) + teamTotals.tov;
+                const usg = teamPoss > 0 ? 100 * (playerPossUsed * teamTotals.min) / (teamPoss * d.min) : 0;
+                
+                const pts = d.pts;
+                const tsa = d.fga + (0.44 * d.fta);
+                const ts_pct = tsa > 0 ? 100 * (pts / (2 * tsa)) : 0;
+                
+                return { ...d, usg: usg, ts_pct: ts_pct };
+            });
+        }
+        
+        const perGameData = calculateDerivedStats(mockData);
+
+        const numericCols = ['min', 'pts', 'reb', 'ast', 'fga', 'fgm', 'fta', 'ftm', '3pa', '3pm', 'tov', 'usg', 'ts_pct'];
+        const averagedData = Array.from(d3.group(perGameData, d => d.player), ([key, value]) => {
+            const playerObj = { player: key, team: value[0].team, pos: value[0].pos };
+            numericCols.forEach(col => {
+                playerObj[col] = d3.mean(value, d => d[col]);
+            });
+            return playerObj;
+        });
+
+        const margin = { top: 20, right: 30, bottom: 60, left: 60 };
+        let width, height;
+
+        const svg = d3.select("#chart-area").append("svg").attr("class", "w-full h-full");
+        const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+        
+        const xAxis = chart.append("g").attr("class", "axis");
+        const yAxis = chart.append("g").attr("class", "axis");
+        
+        const xAxisLabel = chart.append("text").attr("text-anchor", "middle").attr("class", "font-semibold text-gray-600");
+        const yAxisLabel = chart.append("text").attr("text-anchor", "middle").attr("transform", "rotate(-90)").attr("class", "font-semibold text-gray-600");
+
+        const grid = chart.append("g").attr("class", "grid");
+        const tooltip = d3.select("#tooltip");
+
+        const statOptions = [
+            { value: 'pts', label: 'Points' }, { value: 'ast', label: 'Assists' }, { value: 'reb', label: 'Rebounds' },
+            { value: 'usg', label: 'Usage Rate (%)' }, { value: 'ts_pct', label: 'True Shooting (%)' }, { value: 'fga', label: 'Field Goal Attempts' },
+            { value: '3pa', label: '3-Point Attempts' }, { value: 'tov', label: 'Turnovers' },
+        ];
+
+        const viewFilter = d3.select("#view-filter");
+        const teamFilter = d3.select("#team-filter");
+        const playerFilter = d3.select("#player-filter");
+        const xAxisSelect = d3.select("#x-axis-select");
+        const yAxisSelect = d3.select("#y-axis-select");
+
+        const teams = ["All", ...new Set(perGameData.map(d => d.team))];
+        teamFilter.selectAll("option").data(teams).enter().append("option").text(d => d).attr("value", d => d);
+            
+        const players = ["All", ...new Set(perGameData.map(d => d.player))];
+        playerFilter.selectAll("option").data(players).enter().append("option").text(d => d).attr("value", d => d);
+
+        xAxisSelect.selectAll('option').data(statOptions).enter().append('option').text(d => d.label).attr('value', d => d.value);
+        xAxisSelect.property('value', 'usg');
+
+        yAxisSelect.selectAll('option').data(statOptions).enter().append('option').text(d => d.label).attr('value', d => d.value);
+        yAxisSelect.property('value', 'ts_pct');
+        
+        viewFilter.on("change", updateChart);
+        teamFilter.on("change", updateChart);
+        playerFilter.on("change", updateChart);
+        xAxisSelect.on("change", updateChart);
+        yAxisSelect.on("change", updateChart);
+        
+        const colorScale = d3.scaleOrdinal().domain(new Set(perGameData.map(d => d.team))).range(['#003F5C', '#FFA600', '#665191', '#D45087']);
+
+        function updateChart() {
+            const chartArea = d3.select("#chart-area").node();
+            width = chartArea.clientWidth - margin.left - margin.right;
+            height = 500 - margin.top - margin.bottom;
+
+            svg.attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
+            
+            const selectedView = viewFilter.property("value");
+            const selectedTeam = teamFilter.property("value");
+            const selectedPlayer = playerFilter.property("value");
+            const xVal = xAxisSelect.property("value");
+            const yVal = yAxisSelect.property("value");
+
+            const sourceData = selectedView === 'average' ? averagedData : perGameData;
+            
+            let filteredData = sourceData;
+            if (selectedTeam !== "All") {
+                filteredData = filteredData.filter(d => d.team === selectedTeam);
+            }
+            if (selectedPlayer !== "All") {
+                filteredData = filteredData.filter(d => d.player === selectedPlayer);
+            }
+
+            const x = d3.scaleLinear().domain([0, d3.max(filteredData, d => d[xVal]) * 1.1]).range([0, width]);
+            const y = d3.scaleLinear().domain([0, d3.max(filteredData, d => d[yVal]) * 1.1]).range([height, 0]);
+
+            xAxis.attr("transform", `translate(0,${height})`).transition().duration(500).call(d3.axisBottom(x));
+            yAxis.transition().duration(500).call(d3.axisLeft(y));
+            
+            grid.transition().duration(500).call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
+
+            xAxisLabel.attr("x", width / 2).attr("y", height + margin.bottom - 10).text(statOptions.find(opt => opt.value === xVal).label);
+            yAxisLabel.attr("x", -height / 2).attr("y", -margin.left + 20).text(statOptions.find(opt => opt.value === yVal).label);
+
+            const dataKey = d => selectedView === 'average' ? d.player : `${d.player}-${d.game}`;
+            const circles = chart.selectAll("circle").data(filteredData, dataKey);
+            
+            circles.exit().transition().duration(500).attr("r", 0).remove();
+            
+            circles.enter()
+                .append("circle")
+                .attr("cx", d => x(d[xVal]))
+                .attr("cy", d => y(d[yVal]))
+                .attr("r", 0)
+                .style("fill", d => colorScale(d.team))
+                .style("opacity", 0.7)
+                .style("stroke", "white")
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    d3.select(event.currentTarget).style("opacity", 1).style("stroke-width", 2);
+                })
+                .on("mousemove", (event, d) => {
+                    let tooltipHtml = `<strong>${d.player} (${d.team})</strong><br/>`;
+                    if (selectedView === 'game') {
+                        tooltipHtml += `Game ${d.game}<br/>`;
+                    } else {
+                        tooltipHtml += `(Season Average)<br/>`;
+                    }
+                    tooltipHtml += `
+                         ${statOptions.find(opt => opt.value === xVal).label}: ${d[xVal].toFixed(1)}<br/>
+                         ${statOptions.find(opt => opt.value === yVal).label}: ${d[yVal].toFixed(1)}<br/>
+                         PTS: ${d.pts.toFixed(1)} | REB: ${d.reb.toFixed(1)} | AST: ${d.ast.toFixed(1)}`;
+                    tooltip.html(tooltipHtml)
+                           .style("left", (event.pageX + 15) + "px")
+                           .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", (event, d) => {
+                    tooltip.style("opacity", 0);
+                    d3.select(event.currentTarget).style("opacity", 0.7).style("stroke-width", 1);
+                })
+            .merge(circles)
+                .transition().duration(500)
+                .attr("cx", d => x(d[xVal]))
+                .attr("cy", d => y(d[yVal]))
+                .attr("r", 7);
+        }
+
+        updateChart();
+        window.addEventListener('resize', updateChart);
+    </script>
+</body>
+</html>
