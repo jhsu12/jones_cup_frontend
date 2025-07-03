@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coaching Suggestions Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F4F8; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 1.5rem; }
+        h1, h2, h3 { color: #003F5C; }
+        h1 { font-size: 2.25rem; font-weight: 900; text-align: center; margin-bottom: 2rem; }
+        h2 { font-size: 1.5rem; font-weight: 700; border-bottom: 2px solid #FFA600; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; color: #2F4B7C; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .team-select-container { text-align: center; margin-bottom: 2rem; }
+        .team-select {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #D1D5DB;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="container mx-auto p-8">
+        <h1>Coaching & Strategy Report</h1>
+
+        <div class="team-select-container">
+            <label for="team-select" class="sr-only">Select a Team</label>
+            <select id="team-select" class="team-select">
+                <option>Select a team to analyze</option>
+            </select>
+        </div>
+
+        <div id="report-content" class="hidden">
+            <div class="card">
+                <h2 id="team-name-header"></h2>
+                <div id="executive-summary">
+                    <h3>Executive Summary</h3>
+                    <p id="summary-text"></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Offensive Strategy & Tendencies</h2>
+                <div id="offensive-strategy"></div>
+            </div>
+
+            <div class="card">
+                <h2>Defensive Strategy & Vulnerabilities</h2>
+                <div id="defensive-strategy"></div>
+            </div>
+
+            <div class="card">
+                <h2>Key Player Matchups & Game Plan</h2>
+                <div id="player-matchups"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const scoutingData = {
+    "Warriors": {
+        pace: 101.5,
+        summary: "A fast-paced, perimeter-oriented team. Their offense is heavily reliant on the three-point shooting of Curry and Thompson. Defensively, they are solid but can be vulnerable to teams that control the paint.",
+        offense: `
+            <p><strong>Primary Style:</strong> Motion offense, lots of off-ball screens and cutting. They look to create open threes in transition and early in the shot clock.</p>
+            <p><strong>Key Plays:</strong> High pick-and-roll with Curry as the ball-handler. Split cuts and flare screens for Thompson. Green often acts as a facilitator from the high post.</p>
+            <p><strong>Strengths:</strong> Elite three-point shooting, high offensive rating, good ball movement.</p>
+            <p><strong>Weaknesses:</strong> Can be turnover-prone. Live-ball turnovers lead to easy transition points for the opponent. They can struggle if their threes aren't falling.</p>
+        `,
+        defense: `
+            <p><strong>Primary Scheme:</strong> Switching defense, especially on the perimeter. They aim to contest all shots and force turnovers.</p>
+            <p><strong>Strengths:</strong> Good at defending the three-point line. Green is an excellent help defender and communicator.</p>
+            <p><strong>Vulnerabilities:</strong> Can be outrebounded. Teams with dominant post players can find success inside. Their switching scheme can sometimes lead to mismatches.</p>
+        `,
+        matchups: `
+            <p><strong>vs. Curry:</strong> Fight over screens, don't switch. Trap him in pick-and-roll situations to get the ball out of his hands. Be physical and deny him the ball.</p>
+            <p><strong>vs. Thompson:</strong> Stay attached to him at all times. Don't help off him to double-team others. Make him put the ball on the floor.</p>
+            <p><strong>General Game Plan:</strong> Slow the pace down. Attack the paint and force their bigs to defend. Crash the offensive glass. Make them work on defense and run them off the three-point line.</p>
+        `
+    },
+    "Clippers": {
+        pace: 96.2,
+        summary: "A methodical, isolation-heavy team led by their star wings. They have a balanced attack and a solid defense, but can sometimes get stagnant on offense.",
+        offense: "<p><strong>Primary Style:</strong> Isolation and pick-and-roll heavy. They rely on Leonard and George to create their own shots.</p><p><strong>Strengths:</strong> Elite one-on-one scorers. Good mid-range game. They don't turn the ball over much.</p><p><strong>Weaknesses:</strong> Can become predictable and stagnant. Ball movement can suffer. Less effective when their stars are on the bench.</p>",
+        defense: "<p><strong>Primary Scheme:</strong> Man-to-man defense with a focus on individual matchups. They have versatile defenders who can switch multiple positions.</p><p><strong>Strengths:</strong> Excellent perimeter defense. Can lock down opposing star players.</p><p><strong>Vulnerabilities:</strong> Can be susceptible to teams with good ball movement and off-ball action. May struggle against teams with a dominant big man.</p>",
+        matchups: "<p><strong>vs. Leonard/George:</strong> Make them work for their shots. Force them to their weak hand. Send help, but be smart about it to avoid giving up open threes.</p><p><strong>General Game Plan:</strong> Move the ball and make them defend multiple actions. Attack the basket and try to draw fouls. Push the pace in transition before their defense can get set.</p>"
+    },
+    "Thunder": {
+        pace: 103.1,
+        summary: "A young, athletic team that loves to run in transition. Their offense is built around SGA's driving ability. They are an aggressive, opportunistic defensive team.",
+        offense: "<p><strong>Primary Style:</strong> Transition and drive-and-kick. SGA is the primary initiator, constantly probing the defense.</p><p><strong>Strengths:</strong> Elite at getting to the rim and drawing fouls. They play at a high pace and can score in bunches.</p><p><strong>Weaknesses:</strong> Inconsistent outside shooting. Can be turnover-prone due to their aggressive style.</p>",
+        defense: "<p><strong>Primary Scheme:</strong> Aggressive, high-pressure defense. They look to force turnovers and get out in transition.</p><p><strong>Strengths:</strong> Good at creating steals and deflections. They have long, athletic defenders.</p><p><strong>Vulnerabilities:</strong> Can be foul-prone. Their aggressiveness can be used against them with good fakes and ball movement. Can give up open shots if their rotations are late.</p>",
+        matchups: "<p><strong>vs. SGA:</strong> Keep him out of the paint. Force him to be a jump shooter. Send help at the rim, but be ready to rotate to shooters.</p><p><strong>General Game Plan:</strong> Take care of the ball. Make them play in the half-court. Attack their aggressive defense with back-cuts and screens. Exploit their lack of size in the frontcourt.</p>"
+    },
+    "Celtics": {
+        pace: 98.8,
+        summary: "A well-rounded team with two-way star power on the wings. They are one of the best defensive teams in the league and have a versatile offense.",
+        offense: "<p><strong>Primary Style:</strong> A mix of pick-and-roll and isolation, with Tatum and Brown as the primary creators. They have good spacing with shooters around their stars.</p><p><strong>Strengths:</strong> Elite wing scoring. Good three-point shooting. Can score from all three levels.</p><p><strong>Weaknesses:</strong> Can sometimes settle for tough, contested shots. Their offense can become stagnant if the ball isn't moving.</p>",
+        defense: "<p><strong>Primary Scheme:</strong> Elite switching defense. They have versatile defenders at almost every position and can shut down opposing offenses.</p><p><strong>Strengths:</strong> Top-tier defense. They protect the rim well and contest everything on the perimeter.</p><p><strong>Vulnerabilities:</strong> Not many obvious weaknesses. The best way to attack them is with crisp ball movement and by trying to create mismatches before their help defense can recover.</p>",
+        matchups: "<p><strong>vs. Tatum/Brown:</strong> A team effort is required. Make them see multiple bodies. Try to force them into tough, contested mid-range shots.</p><p><strong>General Game Plan:</strong> Be patient on offense. Move the ball and hunt for the best possible shot. Try to get them in foul trouble. Be prepared for a physical, low-scoring game.</p>"
+    },
+    "Lakers": {
+        pace: 102.3,
+        summary: "A veteran team that plays through its two stars, James and Davis. They excel in transition and in the half-court when playing through the post.",
+        offense: "<p><strong>Primary Style:</strong> Transition offense initiated by James. In the half-court, they look to post up James or Davis and play off of them.</p><p><strong>Strengths:</strong> Dominant in the paint. They get to the free-throw line a lot. James is an elite playmaker.</p><p><strong>Weaknesses:</strong> Inconsistent outside shooting. Their offense can struggle when James is on the bench.</p>",
+        defense: "<p><strong>Primary Scheme:</strong> Drop coverage with Davis protecting the rim. They try to funnel everything towards their bigs.</p><p><strong>Strengths:</strong> Excellent rim protection. They are a good rebounding team.</p><p><strong>Vulnerabilities:</strong> Can be vulnerable to pick-and-pop bigs and teams that shoot the three well. Their perimeter defense can be exploited.</p>",
+        matchups: "<p><strong>vs. James:</strong> Give him space and make him a jump shooter. Go under screens. Keep him out of the paint.</p><p><strong>vs. Davis:</strong> Be physical with him. Try to draw him away from the basket on defense. Use a team effort to box him out.</p><p><strong>General Game Plan:</strong> Push the pace and try to score before their defense is set. Shoot a lot of threes. Use a smaller, quicker lineup to try and exploit their lack of perimeter speed.</p>"
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const teamSelect = document.getElementById('team-select');
+    const reportContent = document.getElementById('report-content');
+    const teamNameHeader = document.getElementById('team-name-header');
+    const summaryText = document.getElementById('summary-text');
+    const offensiveStrategy = document.getElementById('offensive-strategy');
+    const defensiveStrategy = document.getElementById('defensive-strategy');
+    const playerMatchups = document.getElementById('player-matchups');
+
+    const teams = Object.keys(scoutingData);
+    teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team;
+        option.textContent = team;
+        teamSelect.appendChild(option);
+    });
+
+    teamSelect.addEventListener('change', (e) => {
+        const selectedTeam = e.target.value;
+        if (scoutingData[selectedTeam]) {
+            const data = scoutingData[selectedTeam];
+            teamNameHeader.textContent = `${selectedTeam} - Analysis`;
+            summaryText.textContent = data.summary;
+            offensiveStrategy.innerHTML = data.offense;
+            defensiveStrategy.innerHTML = data.defense;
+            playerMatchups.innerHTML = data.matchups;
+            reportContent.classList.remove('hidden');
+        } else {
+            reportContent.classList.add('hidden');
+        }
+    });
+});
+</script>
+</body>
+</html>

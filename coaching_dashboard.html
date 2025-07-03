@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Coaching Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F4F8; }
+        .chart-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 1.5rem; }
+        h1, h2 { color: #003F5C; }
+        h1 { font-size: 2.25rem; font-weight: 900; text-align: center; margin-bottom: 1rem; }
+        h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #FFA600; }
+        .control-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+        .control-group { margin: 0.5rem; }
+        .control-label { color: #003F5C; font-weight: 600; margin-right: 0.5rem; }
+        .control-select { padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #D1D5DB; }
+        #shot-chart-container { position: relative; width: 500px; height: 470px; margin: auto; background-image: url('https://storage.googleapis.com/p-xc-m/court.svg'); background-repeat: no-repeat; background-size: contain; }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="container mx-auto p-8">
+        <h1>Advanced Coaching Dashboard</h1>
+        
+        <div class="chart-card">
+            <div class="control-panel">
+                <h2 class="!mb-0 !border-0">Scouting View</h2>
+                <div class="control-group">
+                    <label for="team-select" class="control-label">Team:</label>
+                    <select id="team-select" class="control-select"></select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="chart-card">
+                <h2>Player Shot Chart</h2>
+                <div class="control-group text-center mb-4">
+                    <label for="player-select" class="control-label">Player:</label>
+                    <select id="player-select" class="control-select"></select>
+                </div>
+                <div id="shot-chart-container"></div>
+            </div>
+            <div class="space-y-6">
+                <div class="chart-card">
+                    <h2>Play Type Distribution</h2>
+                    <div class="w-full h-64"><canvas id="play-type-chart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h2>Key Lineup Performance</h2>
+                    <div class="w-full h-64"><canvas id="lineup-chart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const mockShotData = {
+    "S. Curry": Array.from({length: 50}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.5 })),
+    "K. Thompson": Array.from({length: 45}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.55 })),
+    "D. Green": Array.from({length: 20}, () => ({ x: Math.random() * 500, y: Math.random() * 140, made: Math.random() > 0.4 })),
+    "K. Leonard": Array.from({length: 40}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.5 })),
+    "P. George": Array.from({length: 42}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.52 })),
+    "SGA": Array.from({length: 55}, () => ({ x: Math.random() * 500, y: Math.random() * 160, made: Math.random() > 0.48 })),
+    "J. Tatum": Array.from({length: 48}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.51 })),
+    "J. Brown": Array.from({length: 46}, () => ({ x: Math.random() * 500, y: Math.random() * 280, made: Math.random() > 0.53 })),
+    "L. James": Array.from({length: 52}, () => ({ x: Math.random() * 500, y: Math.random() * 180, made: Math.random() > 0.45 })),
+    "A. Davis": Array.from({length: 38}, () => ({ x: Math.random() * 500, y: Math.random() * 140, made: Math.random() > 0.42 })),
+};
+
+const teamData = {
+    "Warriors": {
+        players: ["S. Curry", "K. Thompson", "D. Green"],
+        playTypes: { "Transition": 25, "P&R Ball Handler": 35, "Off Screen": 30, "Isolation": 10 },
+        lineups: [
+            { combo: "Curry/Green", off_rating: 125.2, def_rating: 108.5 },
+            { combo: "Curry/Thompson", off_rating: 122.1, def_rating: 112.3 },
+            { combo: "Thompson/Green", off_rating: 115.8, def_rating: 107.9 },
+        ]
+    },
+    "Clippers": {
+        players: ["K. Leonard", "P. George"],
+        playTypes: { "Isolation": 40, "P&R Ball Handler": 30, "Spot Up": 20, "Transition": 10 },
+        lineups: [
+            { combo: "Leonard/George", off_rating: 118.9, def_rating: 105.4 },
+        ]
+    },
+    "Thunder": {
+        players: ["SGA"],
+        playTypes: { "P&R Ball Handler": 45, "Transition": 30, "Isolation": 20, "Handoff": 5 },
+        lineups: []
+    },
+    "Celtics": {
+        players: ["J. Tatum", "J. Brown"],
+        playTypes: { "Isolation": 30, "P&R Ball Handler": 30, "Spot Up": 25, "Transition": 15 },
+        lineups: [
+            { combo: "Tatum/Brown", off_rating: 119.5, def_rating: 106.1 },
+        ]
+    },
+    "Lakers": {
+        players: ["L. James", "A. Davis"],
+        playTypes: { "P&R Ball Handler": 30, "Post-Up": 25, "Transition": 25, "Isolation": 20 },
+        lineups: [
+            { combo: "James/Davis", off_rating: 121.3, def_rating: 107.2 },
+        ]
+    }
+};
+
+let playTypeChart, lineupChart;
+
+function drawShotChart(playerName) {
+    const shots = mockShotData[playerName] || [];
+    const container = d3.select("#shot-chart-container");
+    container.selectAll("svg").remove();
+
+    const svg = container.append("svg")
+        .attr("width", 500)
+        .attr("height", 470);
+
+    svg.selectAll("circle")
+        .data(shots)
+        .enter()
+        .append("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 5)
+        .style("fill", d => d.made ? "#4CAF50" : "#F44336")
+        .style("opacity", 0.8)
+        .style("stroke", "black")
+        .style("stroke-width", 0.5);
+}
+
+function updatePlayTypeChart(teamName) {
+    const data = teamData[teamName];
+    if (!data) return;
+
+    const chartData = {
+        labels: Object.keys(data.playTypes),
+        datasets: [{
+            label: 'Play Type Frequency',
+            data: Object.values(data.playTypes),
+            backgroundColor: ['#003f5c', '#58508d', '#bc5090', '#ff6361', '#ffa600'],
+        }]
+    };
+
+    if (playTypeChart) {
+        playTypeChart.data = chartData;
+        playTypeChart.update();
+    } else {
+        playTypeChart = new Chart(document.getElementById('play-type-chart'), {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+    }
+}
+
+function updateLineupChart(teamName) {
+    const data = teamData[teamName];
+    if (!data || !data.lineups.length) {
+        if(lineupChart) lineupChart.clear();
+        return;
+    };
+
+    const chartData = {
+        labels: data.lineups.map(l => l.combo),
+        datasets: [
+            {
+                label: 'Offensive Rating',
+                data: data.lineups.map(l => l.off_rating),
+                backgroundColor: '#003f5c',
+                borderColor: '#003f5c',
+            },
+            {
+                label: 'Defensive Rating',
+                data: data.lineups.map(l => l.def_rating),
+                backgroundColor: '#ff6361',
+                borderColor: '#ff6361',
+            }
+        ]
+    };
+    
+    if (lineupChart) {
+        lineupChart.data = chartData;
+        lineupChart.update();
+    } else {
+        lineupChart = new Chart(document.getElementById('lineup-chart'), {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: false, min: 90 } },
+                plugins: { legend: { position: 'top' } }
+            }
+        });
+    }
+}
+
+
+function updateDashboard(teamName) {
+    const team = teamData[teamName];
+    if (!team) return;
+
+    // Update Player Select
+    const playerSelect = document.getElementById('player-select');
+    playerSelect.innerHTML = '';
+    team.players.forEach(playerName => {
+        const option = document.createElement('option');
+        option.value = playerName;
+        option.innerText = playerName;
+        playerSelect.appendChild(option);
+    });
+    
+    // Update Charts
+    drawShotChart(playerSelect.value);
+    updatePlayTypeChart(teamName);
+    updateLineupChart(teamName);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const teamSelect = document.getElementById('team-select');
+    const playerSelect = document.getElementById('player-select');
+
+    Object.keys(teamData).forEach(teamName => {
+        const option = document.createElement('option');
+        option.value = teamName;
+        option.innerText = teamName;
+        teamSelect.appendChild(option);
+    });
+
+    teamSelect.addEventListener('change', (e) => {
+        updateDashboard(e.target.value);
+    });
+
+    playerSelect.addEventListener('change', (e) => {
+        drawShotChart(e.target.value);
+    });
+
+    // Initial Load
+    updateDashboard(teamSelect.value);
+});
+</script>
+</body>
+</html>

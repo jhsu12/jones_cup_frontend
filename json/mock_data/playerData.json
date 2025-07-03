@@ -1,0 +1,6 @@
+[
+    { "team": "Warriors", "player": "S. Curry", "avatarUrl": "https://storage.googleapis.com/p-xc-m/event/417/rosters/674aea80164563b429fb1ea6262051dca1f89a9bbc34a98a20610b181ec61cf4", "pos": "G", "min": 35, "pts": 28, "reb": 5, "ast": 7, "fga": 20, "fgm": 11, "fta": 5, "ftm": 5, "3pa": 7, "3pm": 1, "tov": 3 , "usg": 29.5, "ts_pct": 62.5 },
+    { "team": "Warriors", "player": "K. Thompson", "avatarUrl": "https://storage.googleapis.com/p-xc-m/event/417/rosters/6143927243dccc2373866d3af45af4dd9fea692116f0d4ef76009054f729b950", "pos": "G", "min": 32, "pts": 15, "reb": 3, "ast": 4, "fga": 12, "fgm": 6, "fta": 2, "ftm": 2, "3pa": 6, "3pm": 1, "tov": 2, "usg": 25.2, "ts_pct": 58.1 },
+    { "team": "Lakers", "player": "L. James", "avatarUrl": "https://storage.googleapis.com/p-xc-m/event/417/rosters/47130a42a0c6985bf80e807d12a2b6e5db5c88e9e2b3cb687445b05dea1ceb56", "pos": "F", "min": 38, "pts": 32, "reb": 6, "ast": 9, "fga": 22, "fgm": 12, "fta": 8, "ftm": 6, "3pa": 8, "3pm": 2, "tov": 4, "usg": 31.1, "ts_pct": 60.5 },
+    { "team": "Lakers", "player": "A. Davis", "avatarUrl": "https://storage.googleapis.com/p-xc-m/event/417/rosters/6e760d7dc0fe64f202a58097138b76f886217fa3a57a52a212331b6722635ff1","pos": "F", "min": 30, "pts": 18, "reb": 4, "ast": 2, "fga": 15, "fgm": 6, "fta": 3, "ftm": 3, "3pa": 9, "3pm": 3, "tov": 1, "usg": 28.9, "ts_pct": 63.4 }
+]

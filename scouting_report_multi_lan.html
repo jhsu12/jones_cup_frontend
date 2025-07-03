@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Scouting Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F4F8; }
+        .chart-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 1rem; }
+        .chart-container-sm { position: relative; height: 220px; width: 100%; }
+        .efficiency-chart-container { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 1rem; height: 100%; min-height: 300px; transition: all 0.3s ease-in-out; }
+        .team-circle { cursor: pointer; transition: all 0.3s ease; stroke: #000; stroke-width: 1.5; }
+        .team-circle.selected { stroke: #FFA600; stroke-width: 4; }
+        .tooltip { position: absolute; background: rgba(0, 0, 0, 0.8); color: white; padding: 8px; border-radius: 5px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        .grid-line { stroke: #e0e0e0; stroke-dasharray: 2,2; }
+        .axis { stroke: #333; stroke-width: 1.5; }
+        .average-line { stroke: #999; stroke-dasharray: 4,4; stroke-width: 1; }
+        .data-card { transition: all 0.4s ease-in-out; opacity: 1; }
+        .data-card.loading { opacity: 0.5; transform: scale(0.98); }
+        .pe-tooltip { position: absolute; text-align: left; padding: 8px; font: 12px sans-serif; background: #2D3748; color: #fff; border: 0px; border-radius: 8px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+        .pe-axis path, .pe-axis line { fill: none; stroke: #A0AEC0; shape-rendering: crispEdges; }
+        .pe-axis text { fill: #4A5568; }
+        .pe-grid path, .pe-grid line { fill: none; stroke: #E2E8F0; shape-rendering: crispEdges; }
+        .control-label { color: #003F5C; font-weight: 600; }
+        .pe-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="container mx-auto p-4">
+        <header class="relative mb-8">
+            <div class="flex justify-between items-center">
+                <div class="flex-1"></div>
+                <h1 class="flex-1 text-3xl md:text-4xl font-black text-[#003F5C] tracking-tight text-center" data-translate="main-title">COMPREHENSIVE SCOUTING REPORT</h1>
+                <div class="flex-1 text-right">
+                    <div id="language-switcher-container" class="inline-block mt-4 mr-4">
+                        <select id="language-switcher" class="pe-select bg-white border border-gray-300 rounded-md shadow-sm p-2">
+                            <option value="en">English</option>
+                            <option value="zh-TW">繁體中文</option>
+                            <option value="ko">한국어</option>
+                            <option value="ja">日本語</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-xs mx-auto mt-4">
+                <label for="team-filter" class="sr-only" data-translate="team-filter-label">Select a Team</label>
+                <select id="team-filter" class="block w-full p-2 text-base border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></select>
+                <p id="team-selection-prompt" class="text-gray-500 mt-2" style="display: none;" data-translate="team-selection-prompt"></p>
+            </div>
+        </header>
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 chart-card">
+                <h2 class="text-xl font-bold text-center text-[#003F5C] mb-2" data-translate="team-efficiency-landscape">Team Efficiency Landscape</h2>
+                <div id="chart" class="efficiency-chart-container"></div>
+                <div class="tooltip" id="tooltip"></div>
+            </div>
+            <div id="team-dashboard" class="lg:col-span-1 space-y-4 data-card">
+                <div class="chart-card text-center">
+                    <h3 class="text-lg font-bold text-[#2F4B7C]" data-translate="game-tempo">Game Tempo</h3>
+                    <div class="flex items-baseline justify-center space-x-2">
+                        <p id="pace-value" class="text-7xl font-black text-[#FFA600]"></p>
+                        <p id="average-pace-value" class="text-2xl font-bold text-gray-400"></p>
+                    </div>
+                    <p class="text-sm text-gray-600 font-semibold" data-translate="pace-label">Pace (Possessions per 48 min)</p>
+                </div>
+                <div class="chart-card"><h3 class="text-lg font-bold text-center text-[#2F4B7C] mb-2" data-translate="four-factors-profile">Four Factors Profile</h3><div class="chart-container-sm"><canvas id="fourFactorsChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="text-lg font-bold text-center text-[#665191] mb-2" data-translate="offensive-engine">Offensive Engine</h3><p class="text-sm text-center text-gray-500 -mt-2 mb-2" data-translate="offensive-engine-subtitle">(Top 3 by Usage %)</p><div class="chart-container-sm"><canvas id="playerEngineChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="text-lg font-bold text-center text-[#665191] mb-2" data-translate="player-style">Player Style</h3><div class="chart-container-sm"><canvas id="playerStyleChart"></canvas></div></div>
+            </div>
+        </main>
+        <section class="mt-8">
+             <div class="chart-card">
+                <h2 class="text-xl font-bold text-center text-[#003F5C] mb-2" data-translate="interactive-player-stat-explorer">Interactive Player Stat Explorer</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
+                    <div><label for="pe-team-filter" class="block text-sm control-label mb-1" data-translate="team-label">Team</label><select id="pe-team-filter" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                    <div><label for="pe-player-filter" class="block text-sm control-label mb-1" data-translate="player-label">Player</label><select id="pe-player-filter" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"><option value="All" data-translate="all-players">All Players</option></select></div>
+                    <div><label for="x-axis-select" class="block text-sm control-label mb-1" data-translate="x-axis-label">X-Axis</label><select id="x-axis-select" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                    <div><label for="y-axis-select" class="block text-sm control-label mb-1" data-translate="y-axis-label">Y-Axis</label><select id="y-axis-select" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                </div>
+                <div id="player-explorer-chart-area" class="w-full h-[500px]"></div>
+            </div>
+        </section>
+    </div>
+    <div id="pe-tooltip" class="pe-tooltip"></div>
+<script>
+const translations = {
+    en: {
+        "main-title": "COMPREHENSIVE SCOUTING REPORT",
+        "team-filter-label": "Select a Team",
+        "team-selection-prompt": "Select a team to view the dashboard",
+        "team-efficiency-landscape": "Team Efficiency Landscape",
+        "game-tempo": "Game Tempo",
+        "pace-label": "Pace (Possessions per 48 min)",
+        "four-factors-profile": "Four Factors Profile",
+        "offensive-engine": "Offensive Engine",
+        "offensive-engine-subtitle": "(Top 3 by Usage %)",
+        "player-style": "Player Style",
+        "interactive-player-stat-explorer": "Interactive Player Stat Explorer",
+        "team-label": "Team",
+        "player-label": "Player",
+        "x-axis-label": "X-Axis",
+        "y-axis-label": "Y-Axis",
+        "all-teams": "All Teams",
+        "all-players": "All Players",
+        "stat-pts": "Points",
+        "stat-ast": "Assists",
+        "stat-reb": "Rebounds",
+        "stat-usg": "Usage Rate (%)",
+        "stat-ts_pct": "True Shooting (%)",
+        "stat-fga": "Field Goal Attempts",
+        "stat-3pa": "3-Point Attempts",
+        "stat-tov": "Turnovers"
+    },
+    "zh-TW": {
+        "main-title": "綜合球探報告",
+        "team-filter-label": "選擇球隊",
+        "team-selection-prompt": "選擇一支球隊查看儀表板",
+        "team-efficiency-landscape": "球隊效率概覽",
+        "game-tempo": "比賽節奏",
+        "pace-label": "節奏 (每48分鐘回合數)",
+        "four-factors-profile": "四要素分析",
+        "offensive-engine": "進攻引擎",
+        "offensive-engine-subtitle": "(前三名使用率 %)",
+        "player-style": "球員風格",
+        "interactive-player-stat-explorer": "互動式球員數據瀏覽器",
+        "team-label": "球隊",
+        "player-label": "球員",
+        "x-axis-label": "X軸",
+        "y-axis-label": "Y軸",
+        "all-teams": "所有球隊",
+        "all-players": "所有球員",
+        "stat-pts": "得分",
+        "stat-ast": "助攻",
+        "stat-reb": "籃板",
+        "stat-usg": "使用率 (%)",
+        "stat-ts_pct": "真實命中率 (%)",
+        "stat-fga": "投籃次數",
+        "stat-3pa": "三分球投籃次數",
+        "stat-tov": "失誤"
+    },
+    ko: {
+        "main-title": "종합 스카우팅 리포트",
+        "team-filter-label": "팀 선택",
+        "team-selection-prompt": "대시보드를 보려면 팀을 선택하세요",
+        "team-efficiency-landscape": "팀 효율성 랜드스케이프",
+        "game-tempo": "게임 템포",
+        "pace-label": "페이스 (48분당 포제션)",
+        "four-factors-profile": "네 가지 요소 프로필",
+        "offensive-engine": "공격 엔진",
+        "offensive-engine-subtitle": "(상위 3위 사용률 %)",
+        "player-style": "선수 스타일",
+        "interactive-player-stat-explorer": "인터랙티브 선수 스탯 탐색기",
+        "team-label": "팀",
+        "player-label": "선수",
+        "x-axis-label": "X축",
+        "y-axis-label": "Y축",
+        "all-teams": "모든 팀",
+        "all-players": "모든 선수",
+        "stat-pts": "득점",
+        "stat-ast": "어시스트",
+        "stat-reb": "리바운드",
+        "stat-usg": "사용률 (%)",
+        "stat-ts_pct": "실제 슈팅률 (%)",
+        "stat-fga": "필드골 시도",
+        "stat-3pa": "3점슛 시도",
+        "stat-tov": "턴오버"
+    },
+    ja: {
+        "main-title": "総合スカウティングレポート",
+        "team-filter-label": "チームを選択",
+        "team-selection-prompt": "ダッシュボードを表示するチームを選択してください",
+        "team-efficiency-landscape": "チーム効率のランドスケープ",
+        "game-tempo": "ゲームテンポ",
+        "pace-label": "ペース (48分あたりのポゼッション)",
+        "four-factors-profile": "4つの要因プロファイル",
+        "offensive-engine": "オフェンシブエンジン",
+        "offensive-engine-subtitle": "(上位3つの使用率 %)",
+        "player-style": "プレイヤースタイル",
+        "interactive-player-stat-explorer": "インタラクティブな選手スタッツエクスプローラー",
+        "team-label": "チーム",
+        "player-label": "選手",
+        "x-axis-label": "X軸",
+        "y-axis-label": "Y軸",
+        "all-teams": "すべてのチーム",
+        "all-players": "すべての選手",
+        "stat-pts": "得点",
+        "stat-ast": "アシスト",
+        "stat-reb": "リバウンド",
+        "stat-usg": "使用率 (%)",
+        "stat-ts_pct": "トゥルーシューティング率 (%)",
+        "stat-fga": "フィールドゴール試行",
+        "stat-3pa": "3ポイント試行",
+        "stat-tov": "ターンオーバー"
+    }
+};
+const scoutingData = {
+    "Warriors": { pace: 101.5, fourFactors: { offense: [95, 60, 40, 85], defense: [80, 75, 50, 60] }, players: [ { name: "S. Curry", usg: 32.1, ts: 65.5, style: { "2PA": 40, "3PA": 50, "FTA": 10 } }, { name: "K. Thompson", usg: 25.8, ts: 59.2, style: { "2PA": 30, "3PA": 60, "FTA": 10 } }, { name: "D. Green", usg: 15.3, ts: 54.1, style: { "2PA": 70, "3PA": 20, "FTA": 10 } } ] },
+    "Clippers": { pace: 96.2, fourFactors: { offense: [80, 85, 60, 70], defense: [70, 65, 75, 50] }, players: [ { name: "K. Leonard", usg: 29.5, ts: 62.1, style: { "2PA": 60, "3PA": 30, "FTA": 10 } }, { name: "P. George", usg: 28.9, ts: 60.3, style: { "2PA": 45, "3PA": 45, "FTA": 10 } }, { name: "N. Powell", usg: 21.0, ts: 61.8, style: { "2PA": 50, "3PA": 35, "FTA": 15 } } ] },
+    "Thunder": { pace: 103.1, fourFactors: { offense: [70, 50, 75, 90], defense: [65, 85, 60, 80] }, players: [ { name: "SGA", usg: 33.0, ts: 63.2, style: { "2PA": 65, "3PA": 15, "FTA": 20 } }, { name: "J. Giddey", usg: 24.1, ts: 53.8, style: { "2PA": 75, "3PA": 15, "FTA": 10 } }, { name: "L. Dort", usg: 18.5, ts: 55.9, style: { "2PA": 40, "3PA": 50, "FTA": 10 } } ] },
+    "Celtics": { pace: 98.8, fourFactors: { offense: [88, 80, 65, 60], defense: [90, 80, 85, 40] }, players: [ { name: "J. Tatum", usg: 31.5, ts: 61.4, style: { "2PA": 50, "3PA": 40, "FTA": 10 } }, { name: "J. Brown", usg: 29.8, ts: 59.9, style: { "2PA": 60, "3PA": 30, "FTA": 10 } }, { name: "D. White", usg: 17.2, ts: 62.5, style: { "2PA": 40, "3PA": 50, "FTA": 10 } } ] },
+    "Lakers": { pace: 102.3, fourFactors: { offense: [75, 65, 70, 88], defense: [75, 70, 78, 70] }, players: [ { name: "L. James", usg: 30.1, ts: 60.8, style: { "2PA": 65, "3PA": 25, "FTA": 10 } }, { name: "A. Davis", usg: 28.4, ts: 64.2, style: { "2PA": 70, "3PA": 10, "FTA": 20 } }, { name: "A. Reaves", usg: 19.3, ts: 61.9, style: { "2PA": 55, "3PA": 30, "FTA": 15 } } ] }
+};
+const teams = [
+    { name: "Warriors", offense: 120.2, defense: 113.8, logoUrl: "https://storage.googleapis.com/p-xc-m/event/416/squads/cdd5dbcf6e4e40d3c6fa1dc556ec4b78e4cabfbb4dfddd80a05990bdaea9b42b" },
+    { name: "Clippers", offense: 112.3, defense: 103.5, logoUrl: "https://storage.googleapis.com/p-xc-m/event/416/squads/9e78de903e7fdb8b2458011575cdd087b600fcac61ac94dbca3642f7b4f7f8e9" },
+    { name: "Thunder", offense: 111.1, defense: 99.2,  logoUrl: "https://storage.googleapis.com/p-xc-m/event/416/squads/c2be655be99db096194132a6f3f509afcc98e3a38f48a3295ccd0002cf2fa6c9" },
+    { name: "Celtics", offense: 108.9, defense: 98.5, logoUrl: "https://storage.googleapis.com/p-xc-m/event/417/squads/d8c35320ae26ede7e2650a0796fff6d6953f9ade0248f611c83026ffc279a25d" },
+    { name: "Lakers", offense: 99.2, defense: 103.1, logoUrl: "https://storage.googleapis.com/p-xc-m/event/417/squads/66c8691d2debaaeabd22fe90dd73ca5da9033778ad0e98048e366118bae57ba2"}
+];
+const averagePace = (Object.values(scoutingData).reduce((sum, team) => sum + team.pace, 0) / Object.keys(scoutingData).length).toFixed(1);
+
+let fourFactorsChart, playerEngineChart, playerStyleChart;
+let currentLang = 'en';
+
+const pe_statOptions = [
+    { value: 'pts', label: 'stat-pts' },
+    { value: 'ast', label: 'stat-ast' },
+    { value: 'reb', label: 'stat-reb' },
+    { value: 'usg', label: 'stat-usg' },
+    { value: 'ts_pct', label: 'stat-ts_pct' },
+    { value: 'fga', label: 'stat-fga' },
+    { value: '3pa', label: 'stat-3pa' },
+    { value: 'tov', label: 'stat-tov' }
+];
+
+function initializeCharts() {
+    const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+    const radarOptions = { ...chartOptions, scales: { r: { suggestedMin: 0, suggestedMax: 100, grid: { color: 'rgba(0,0,0,0.05)' }, pointLabels: { font: { size: 10 } }, ticks: { display: false } } }, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } } };
+    const barOptions = { ...chartOptions, scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } } };
+    const horizontalBarOptions = { ...barOptions, indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true } } };
+
+    fourFactorsChart = new Chart(document.getElementById('fourFactorsChart'), { type: 'radar', data: { labels: ['eFG%', 'TOV%', 'ORB%', 'FT Rate'], datasets: [{}, {}] }, options: radarOptions });
+    playerEngineChart = new Chart(document.getElementById('playerEngineChart'), { type: 'bar', data: { labels: [], datasets: [{}, {}] }, options: barOptions });
+    playerStyleChart = new Chart(document.getElementById('playerStyleChart'), { type: 'bar', data: { labels: [], datasets: [{}, {}, {}] }, options: horizontalBarOptions });
+}
+
+function updateDashboard(teamName, isAllTeams) {
+    const dashboard = document.getElementById('team-dashboard');
+    const prompt = document.getElementById('team-selection-prompt');
+    dashboard.classList.add('loading');
+    const brilliantBlues = ['#003F5C', '#665191', '#D45087', '#FFA600'];
+    const brilliantBluesTransparent = ['rgba(0, 63, 92, 0.6)', 'rgba(102, 81, 145, 0.6)', 'rgba(212, 80, 135, 0.6)', 'rgba(255, 166, 0, 0.6)'];
+
+    if (isAllTeams) {
+        prompt.style.display = 'block';
+        document.getElementById('pace-value').innerText = averagePace;
+        document.getElementById('average-pace-value').innerText = "avg pace";
+        
+        fourFactorsChart.data.datasets = [{
+            label: 'Offense', data: [], backgroundColor: brilliantBluesTransparent[1], borderColor: brilliantBlues[1], borderWidth: 2
+        }, {
+            label: 'Defense', data: [], backgroundColor: brilliantBluesTransparent[2], borderColor: brilliantBlues[2], borderWidth: 2
+        }];
+        fourFactorsChart.update();
+
+        playerEngineChart.data.labels = [];
+        playerEngineChart.data.datasets = [];
+        playerEngineChart.update();
+
+        playerStyleChart.data.labels = [];
+        playerStyleChart.data.datasets = [];
+        playerStyleChart.update();
+
+        dashboard.classList.remove('loading');
+        return;
+    }
+
+    prompt.style.display = 'none';
+    setTimeout(() => {
+        const data = scoutingData[teamName];
+        document.getElementById('pace-value').innerText = data.pace;
+        document.getElementById('average-pace-value').innerText = `/ ${averagePace} avg`;
+
+        fourFactorsChart.data.datasets[0] = { label: 'Offense', data: data.fourFactors.offense, backgroundColor: brilliantBluesTransparent[1], borderColor: brilliantBlues[1], borderWidth: 2 };
+        fourFactorsChart.data.datasets[1] = { label: 'Defense', data: data.fourFactors.defense, backgroundColor: brilliantBluesTransparent[2], borderColor: brilliantBlues[2], borderWidth: 2 };
+        fourFactorsChart.update();
+
+        const topPlayers = data.players.sort((a, b) => b.usg - a.usg).slice(0, 3);
+
+        playerEngineChart.data.labels = topPlayers.map(p => p.name);
+        playerEngineChart.data.datasets[0] = { label: 'USG%', data: topPlayers.map(p => p.usg), backgroundColor: brilliantBlues[0] };
+        playerEngineChart.data.datasets[1] = { label: 'TS%', data: topPlayers.map(p => p.ts), backgroundColor: brilliantBlues[3] };
+        playerEngineChart.update();
+
+        playerStyleChart.data.labels = topPlayers.map(p => p.name);
+        playerStyleChart.data.datasets[0] = { label: '2PA%', data: topPlayers.map(p => p.style['2PA']), backgroundColor: brilliantBlues[0] };
+        playerStyleChart.data.datasets[1] = { label: '3PA%', data: topPlayers.map(p => p.style['3PA']), backgroundColor: brilliantBlues[1] };
+        playerStyleChart.data.datasets[2] = { label: 'FTA%', data: topPlayers.map(p => p.style['FTA']), backgroundColor: brilliantBlues[2] };
+        playerStyleChart.update();
+
+        d3.selectAll(".team-circle").classed("selected", false).transition().duration(200).attr("r", 15);
+        d3.select(`#circle-${teamName}`).classed("selected", true).raise().transition().duration(200).attr("r", 20);
+        
+        dashboard.classList.remove('loading');
+    }, 300);
+}
+
+function drawEfficiencyChart() {
+    const chartContainer = d3.select("#chart");
+    chartContainer.html("");
+    const bounds = chartContainer.node().getBoundingClientRect();
+    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+    const width = bounds.width - margin.left - margin.right;
+    let height = bounds.height - margin.top - margin.bottom;
+
+    if (width > 0 && height < 150) {
+        height = Math.min(width * 0.8, 500);
+    }
+
+    const svg = chartContainer.append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 ${bounds.width} ${height + margin.top + margin.bottom}`);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const xScale = d3.scaleLinear().domain([95, 125]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([95, 125]).range([height, 0]);
+    const avgOffense = d3.mean(teams, d => d.offense);
+    const avgDefense = d3.mean(teams, d => d.defense);
+    g.append("g").attr("class", "grid").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5).tickSize(-height).tickFormat("")).selectAll("line").attr("class", "grid-line");
+    g.append("g").attr("class", "grid").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat("")).selectAll("line").attr("class", "grid-line");
+    g.append("line").attr("class", "average-line").attr("x1", 0).attr("x2", width).attr("y1", yScale(avgOffense)).attr("y2", yScale(avgOffense));
+    g.append("line").attr("class", "average-line").attr("x1", xScale(avgDefense)).attr("x2", xScale(avgDefense)).attr("y1", 0).attr("y2", height);
+    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5));
+    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale).ticks(5));
+    svg.append("text").attr("class", "axis-label").attr("x", margin.left + width / 2).attr("y", height + margin.top + 35).style("text-anchor", "middle").style("font-size", "12px").text("Defensive Rating");
+    svg.append("text").attr("class", "axis-label").attr("transform", "rotate(-90)").attr("y", 15).attr("x", -(margin.top + height / 2)).style("text-anchor", "middle").style("font-size", "12px").text("Offensive Rating");
+    const tooltip = d3.select("#tooltip");
+    const defs = g.append("defs");
+    defs.selectAll(".team-pattern").data(teams).enter().append("pattern").attr("id", (d) => `logo-${d.name}`).attr("width", 1).attr("height", 1).attr("patternContentUnits", "objectBoundingBox").append("image").attr("xlink:href", d => d.logoUrl).attr("width", 1).attr("height", 1).attr("preserveAspectRatio", "xMidYMid slice");
+    g.selectAll(".team-circle").data(teams).enter().append("circle").attr("class", "team-circle").attr("id", d => `circle-${d.name}`).attr("cx", d => xScale(d.defense)).attr("cy", d => yScale(d.offense)).attr("r", 15).attr("fill", d => `url(#logo-${d.name})`).on("mouseover", function(event, d) {
+        d3.select(this).raise().transition().duration(200).attr("r", 18);
+        tooltip.style("opacity", 1).html(`<strong>${d.name}</strong><br/>Off: ${d.offense}<br/>Def: ${d.defense}`).style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 10) + "px");
+    }).on("mouseout", function(event, d) {
+        if (!d3.select(this).classed("selected")) { d3.select(this).transition().duration(200).attr("r", 15); }
+        tooltip.style("opacity", 0);
+    });
+}
+
+const mockData = [
+    { team: 'Warriors', player: 'S. Curry', avatarUrl: "https://storage.googleapis.com/p-xc-m/event/417/rosters/674aea80164563b429fb1ea6262051dca1f89a9bbc34a98a20610b181ec61cf4", pos: 'G', min: 35, pts: 28, reb: 5, ast: 7, fga: 20, fgm: 11, fta: 5, ftm: 5, "3pa": 7, "3pm": 1, tov: 3 , usg: 29.5, ts_pct: 62.5 },
+    { team: 'Warriors', player: 'K. Thompson', avatarUrl: "https://storage.googleapis.com/p-xc-m/event/417/rosters/6143927243dccc2373866d3af45af4dd9fea692116f0d4ef76009054f729b950", pos: 'G', min: 32, pts: 15, reb: 3, ast: 4, fga: 12, fgm: 6, fta: 2, ftm: 2, "3pa": 6, "3pm": 1, tov: 2, usg: 25.2, ts_pct: 58.1 },
+    { team: 'Lakers', player: 'L. James', avatarUrl: "https://storage.googleapis.com/p-xc-m/event/417/rosters/47130a42a0c6985bf80e807d12a2b6e5db5c88e9e2b3cb687445b05dea1ceb56", pos: 'F', min: 38, pts: 32, reb: 6, ast: 9, fga: 22, fgm: 12, fta: 8, ftm: 6, "3pa": 8, "3pm": 2, tov: 4, usg: 31.1, ts_pct: 60.5 },
+    { team: 'Lakers', player: 'A. Davis', avatarUrl: "https://storage.googleapis.com/p-xc-m/event/417/rosters/6e760d7dc0fe64f202a58097138b76f886217fa3a57a52a212331b6722635ff1",pos: 'F', min: 30, pts: 18, reb: 4, ast: 2, fga: 15, fgm: 6, fta: 3, ftm: 3, "3pa": 9, "3pm": 3, tov: 1, usg: 28.9, ts_pct: 63.4 },
+];
+let pe_averagedData;
+const pe_margin = { top: 20, right: 30, bottom: 60, left: 60 };
+let pe_width, pe_height;
+const pe_svg = d3.select("#player-explorer-chart-area").append("svg").attr("class", "w-full h-full");
+const pe_chart = pe_svg.append("g").attr("transform", `translate(${pe_margin.left},${pe_margin.top})`);
+const pe_xAxis = pe_chart.append("g").attr("class", "pe-axis");
+const pe_yAxis = pe_chart.append("g").attr("class", "pe-axis");
+const pe_xAxisLabel = pe_chart.append("text").attr("text-anchor", "middle").attr("class", "font-semibold text-gray-600");
+const pe_yAxisLabel = pe_chart.append("text").attr("text-anchor", "middle").attr("transform", "rotate(-90)").attr("class", "font-semibold text-gray-600");
+const pe_grid = pe_chart.append("g").attr("class", "pe-grid");
+const pe_tooltip = d3.select("#pe-tooltip");
+
+function initializePlayerExplorer() {
+    pe_averagedData = mockData;
+    const teamFilter = d3.select("#pe-team-filter");
+    const playerFilter = d3.select("#pe-player-filter"), xAxisSelect = d3.select("#x-axis-select"), yAxisSelect = d3.select("#y-axis-select");
+
+    const teamNames = ["All", ...Object.keys(scoutingData)];
+    teamFilter.selectAll("option").data(teamNames).enter().append("option").text(d => d === 'All' ? translations[currentLang]["all-teams"] : d).attr("value", d => d).attr("data-translate", d => d === 'All' ? 'all-teams' : `team-${d.toLowerCase()}`);
+
+    const players = ["All", ...new Set(pe_averagedData.map(d => d.player))];
+    playerFilter.selectAll("option").data(players).enter().append("option").text(d => d === 'All' ? translations[currentLang]["all-players"] : d).attr("value", d => d).attr("data-translate", d => d === 'All' ? 'all-players' : `player-${d.toLowerCase().replace(/\./g, "").replace(/\s/g, "-")}`);
+    
+    xAxisSelect.selectAll('option').data(pe_statOptions).enter().append('option').text(d => translations[currentLang][d.label]).attr('value', d => d.value).attr('data-translate', d => d.label);
+    yAxisSelect.selectAll('option').data(pe_statOptions).enter().append('option').text(d => translations[currentLang][d.label]).attr('value', d => d.value).attr('data-translate', d => d.label);
+    
+    xAxisSelect.property('value', 'usg');
+    yAxisSelect.property('value', 'ts_pct');
+
+    teamFilter.on("change", updatePlayerExplorer);
+    playerFilter.on("change", updatePlayerExplorer); 
+    xAxisSelect.on("change", updatePlayerExplorer); 
+    yAxisSelect.on("change", updatePlayerExplorer);
+}
+
+function updatePlayerExplorer() {
+    const chartArea = d3.select("#player-explorer-chart-area").node();
+    pe_width = chartArea.clientWidth - pe_margin.left - pe_margin.right;
+    pe_height = 500 - pe_margin.top - pe_margin.bottom;
+    pe_svg.attr("width", pe_width + pe_margin.left + pe_margin.right).attr("height", 500);
+    const selectedTeam = d3.select("#pe-team-filter").property("value");
+    const selectedPlayer = d3.select("#pe-player-filter").property("value"), xVal = d3.select("#x-axis-select").property("value"), yVal = d3.select("#y-axis-select").property("value");
+    
+    let filteredData = pe_averagedData;
+    if (selectedTeam !== "All") {
+        filteredData = filteredData.filter(d => d.team === selectedTeam);
+    }
+    if (selectedPlayer !== "All") { 
+        filteredData = filteredData.filter(d => d.player === selectedPlayer); 
+    }
+
+    const x = d3.scaleLinear().domain([0, d3.max(filteredData, d => d[xVal]) * 1.1 || 10]).range([0, pe_width]);
+    const y = d3.scaleLinear().domain([0, d3.max(filteredData, d => d[yVal]) * 1.1 || 10]).range([pe_height, 0]);
+    
+    pe_xAxis.attr("transform", `translate(0,${pe_height})`).transition().duration(500).call(d3.axisBottom(x));
+    pe_yAxis.transition().duration(500).call(d3.axisLeft(y));
+    pe_grid.transition().duration(500).call(d3.axisLeft(y).tickSize(-pe_width).tickFormat(""));
+    pe_xAxisLabel.attr("x", pe_width / 2).attr("y", pe_height + pe_margin.bottom - 10).text(translations[currentLang][pe_statOptions.find(opt => opt.value === xVal).label]);
+    pe_yAxisLabel.attr("x", -pe_height / 2).attr("y", -pe_margin.left + 20).text(translations[currentLang][pe_statOptions.find(opt => opt.value === yVal).label]);
+
+    const defs = pe_svg.selectAll("defs").data([null]).join("defs");
+
+    defs.selectAll(".player-pattern")
+        .data(pe_averagedData, d => d.player)
+        .join(
+            enter => enter.append("pattern")
+                .attr("class", "player-pattern")
+                .attr("id", d => `avatar-${d.player.replace(/[\.\s']/g, '-')}`)
+                .attr("width", 1).attr("height", 1)
+                .attr("patternContentUnits", "objectBoundingBox")
+                .append("image")
+                .attr("xlink:href", d => d.avatarUrl)
+                .attr("width", 1).attr("height", 1)
+                .attr("preserveAspectRatio", "xMidYMid slice")
+        );
+
+    const dataKey = d => d.player;
+    const circles = pe_chart.selectAll("circle").data(filteredData, dataKey);
+    
+    circles.exit().transition().duration(500).attr("r", 0).remove();
+    
+    circles.enter().append("circle")
+        .attr("r", 0)
+        .style("fill", d => `url(#avatar-${d.player.replace(/[\.\s']/g, '-')})`)
+        .style("stroke", "#003F5C")
+        .style("stroke-width", 1.5)
+    .merge(circles)
+        .on("mouseover", (event, d) => { 
+            pe_tooltip.style("opacity", 1); 
+            d3.select(event.currentTarget).raise().transition().duration(200).attr("r", 24).style("stroke-width", 3);
+        })
+        .on("mousemove", (event, d) => { 
+            const xVal = d3.select("#x-axis-select").property("value");
+            const yVal = d3.select("#y-axis-select").property("value");
+            let h = `<strong>${d.player}</strong><br/>`;
+            h += `${translations[currentLang][pe_statOptions.find(opt => opt.value === xVal).label]}: ${d[xVal].toFixed(1)}<br/>`;
+            h += `${translations[currentLang][pe_statOptions.find(opt => opt.value === yVal).label]}: ${d[yVal].toFixed(1)}`;
+            pe_tooltip.html(h).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"); 
+        })
+        .on("mouseout", (event, d) => { 
+            pe_tooltip.style("opacity", 0); 
+            d3.select(event.currentTarget).transition().duration(200).attr("r", 20).style("stroke-width", 1.5);
+        })
+        .transition().duration(500)
+        .attr("cx", d => x(d[xVal]))
+        .attr("cy", d => y(d[yVal]))
+        .attr("r", 20);
+}
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
+            el.innerText = translations[lang][key];
+        }
+    });
+    updatePlayerExplorer();
+    updateDashboard(document.getElementById('team-filter').value, document.getElementById('team-filter').value === 'All');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const landscapeFilter = document.getElementById('team-filter');
+    const languageSwitcher = document.getElementById('language-switcher');
+    
+    const allTeamsOption = document.createElement('option');
+    allTeamsOption.value = "All";
+    allTeamsOption.innerText = translations[currentLang]["all-teams"];
+    allTeamsOption.setAttribute('data-translate', 'all-teams');
+    landscapeFilter.appendChild(allTeamsOption);
+
+    Object.keys(scoutingData).forEach(teamName => { 
+        const option = document.createElement('option'); 
+        option.value = teamName; 
+        option.innerText = teamName; 
+        landscapeFilter.appendChild(option); 
+    });
+    
+    landscapeFilter.value = "All";
+
+    drawEfficiencyChart();
+    initializeCharts();
+    initializePlayerExplorer();
+    updatePlayerExplorer();
+    updateDashboard(null, true);
+    
+    landscapeFilter.addEventListener('change', (e) => { 
+        const selectedTeam = e.target.value;
+        if (selectedTeam !== "All") {
+            updateDashboard(selectedTeam, false);
+        } else {
+            d3.selectAll(".team-circle").classed("selected", false).transition().duration(200).attr("r", 15);
+            updateDashboard(null, true);
+        }
+    });
+
+    languageSwitcher.addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+    });
+    
+    window.addEventListener('resize', () => { 
+        drawEfficiencyChart(); 
+        updatePlayerExplorer(); 
+        if (landscapeFilter.value === 'All') {
+            updateDashboard(null, true);
+        }
+    });
+});
+</script>
+</body>
+</html>
