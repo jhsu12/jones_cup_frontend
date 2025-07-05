@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Shooting Percentage Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+        }
+        .court-container {
+            display: flex;
+            justify-content: center;
+        }
+        .zone-label {
+            font-size: 16px;
+            font-weight: bold;
+            text-anchor: middle;
+            fill: white;
+            pointer-events: none; /* Make text non-interactive */
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+        .percentage-text {
+            font-size: 18px;
+            font-weight: bold;
+            text-anchor: middle;
+            fill: white;
+            pointer-events: none; /* Make text non-interactive */
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+        .court-line {
+            stroke: #1a1a1a;
+            stroke-width: 2;
+            fill: none;
+        }
+        .zone-area {
+            stroke: none; /* No stroke on the colored areas themselves */
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Basketball Shooting Attempt Percentages</div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #87CEEB;"></div>
+                <span>Low Percentage</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #1E3A8A;"></div>
+                <span>High Percentage</span>
+            </div>
+        </div>
+        
+        <div class="court-container">
+            <svg id="basketball-court" width="500" height="470"></svg>
+        </div>
+    </div>
+
+    <script>
+        // --- Data ---
+        const data = {
+            "MidRangeAttempt": 30,
+            "PaintAttempt": 45,
+            "3PAttempt": 25
+        };
+
+        // --- Setup ---
+        const svg = d3.select("#basketball-court");
+        const width = +svg.attr("width");
+        const height = +svg.attr("height");
+
+        // --- Color Scale ---
+        const percentages = Object.values(data);
+        const colorScale = d3.scaleLinear()
+            .domain([d3.min(percentages), d3.max(percentages)])
+            .range(["#87CEEB", "#1E3A8A"]);
+
+        // --- Court Dimensions (scaled to NBA court proportions) ---
+        const court = {
+            width: 500, // 50 feet
+            height: 470, // 47 feet
+            paintWidth: 160, // 16 feet
+            paintHeight: 190, // 19 feet
+            threePointRadius: 237.5, // 23.75 feet
+            threePointSideY: height - 140, // 14 feet from baseline
+            cornerThreeX: 30, // 3 feet from sideline
+            basketY: height - 52.5, // 5.25 feet from baseline
+            basketRadius: 7.5,
+            ftCircleRadius: 60 // 6 feet
+        };
+        court.paintX = (court.width - court.paintWidth) / 2;
+        court.paintY = court.height - court.paintHeight;
+        court.centerX = court.width / 2;
+        
+        // --- Path Definitions ---
+
+        // Path for the area inside the three-point line
+        const threePointAreaPath = `
+            M ${court.cornerThreeX}, ${court.height}
+            L ${court.cornerThreeX}, ${court.threePointSideY}
+            A ${court.threePointRadius} ${court.threePointRadius} 0 0 1 ${court.width - court.cornerThreeX} ${court.threePointSideY}
+            L ${court.width - court.cornerThreeX}, ${court.height}
+            Z
+        `;
+
+        // Path for the Mid-Range zone (a donut shape)
+        // This combines the three-point area path and the paint area path
+        // The "evenodd" fill rule will create the hole.
+        const midRangePath = `
+            ${threePointAreaPath}
+            M ${court.paintX}, ${court.paintY}
+            L ${court.paintX + court.paintWidth}, ${court.paintY}
+            L ${court.paintX + court.paintWidth}, ${court.height}
+            L ${court.paintX}, ${court.height}
+            Z
+        `;
+
+        // --- 1. Draw Zone Fills (from background to foreground) ---
+
+        // 3-Point Zone (colors the whole court first)
+        svg.append("rect")
+            .attr("width", court.width)
+            .attr("height", court.height)
+            .attr("fill", colorScale(data["3PAttempt"]))
+            .attr("class", "zone-area");
+
+        // Mid-Range Zone (drawn on top of the 3-point zone)
+        // Uses a single path with a hole for the paint
+        svg.append("path")
+            .attr("d", midRangePath)
+            .attr("fill", colorScale(data.MidRangeAttempt))
+            .attr("fill-rule", "evenodd") // Important for creating the hole
+            .attr("class", "zone-area");
+
+        // Paint Zone (drawn on top of the mid-range zone)
+        svg.append("rect")
+            .attr("x", court.paintX)
+            .attr("y", court.paintY)
+            .attr("width", court.paintWidth)
+            .attr("height", court.paintHeight)
+            .attr("fill", colorScale(data.PaintAttempt))
+            .attr("class", "zone-area");
+
+        // --- 2. Draw Court Lines (on top of the fills) ---
+
+        // Three-Point Line
+        svg.append("path")
+            .attr("d", threePointAreaPath)
+            .attr("class", "court-line");
+
+        // Paint
+        svg.append("rect")
+            .attr("x", court.paintX)
+            .attr("y", court.paintY)
+            .attr("width", court.paintWidth)
+            .attr("height", court.paintHeight)
+            .attr("class", "court-line");
+            
+        // Free Throw Circle
+        svg.append("circle")
+           .attr("cx", court.centerX)
+           .attr("cy", court.paintY)
+           .attr("r", court.ftCircleRadius)
+           .attr("class", "court-line");
+           
+        // Basket (Hoop and Backboard)
+         svg.append("line")
+            .attr("x1", court.centerX - 30)
+            .attr("y1", court.basketY)
+            .attr("x2", court.centerX + 30)
+            .attr("y2", court.basketY)
+            .style("stroke", "#1a1a1a")
+            .style("stroke-width", "3");
+
+        svg.append("circle")
+            .attr("cx", court.centerX)
+            .attr("cy", court.basketY)
+            .attr("r", court.basketRadius)
+            .attr("class", "court-line")
+            .style("fill", "#f5f5f5");
+
+        // --- 3. Draw Labels and Percentages ---
+        
+        // 3-Point Label
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", 100)
+            .attr("class", "zone-label")
+            .text("3-Point");
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", 125)
+            .attr("class", "percentage-text")
+            .text(`${data["3PAttempt"]}%`);
+            
+        // Mid-Range Label
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", court.height - 220) // Adjusted y-position for better placement
+            .attr("class", "zone-label")
+            .text("Mid-Range");
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", court.height - 195) // Adjusted y-position
+            .attr("class", "percentage-text")
+            .text(`${data.MidRangeAttempt}%`);
+
+        // Paint Label
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", court.height - 95) // Adjusted y-position
+            .attr("class", "zone-label")
+            .text("Paint");
+        svg.append("text")
+            .attr("x", court.centerX)
+            .attr("y", court.height - 70) // Adjusted y-position
+            .attr("class", "percentage-text")
+            .text(`${data.PaintAttempt}%`);
+
+    </script>
+</body>
+</html>
