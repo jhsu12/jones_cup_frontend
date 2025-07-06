@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Poetry virtual environments
+.env
+
+# 檔案系統產物
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoint
+.ipynb_checkpoints/
+
+# 測試檔案
+*.csv
+*.xlsx

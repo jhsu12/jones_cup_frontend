@@ -1,0 +1,56 @@
+name: Deploy To Stage On Push Tag
+
+on:
+  push:
+    tags:
+      - "s*"
+
+env:
+  PROJECT_ID:
+  SERVICE:
+  REPOSITORY:
+  IMAGE:
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Tag Name & Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json:
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set Configure Docker
+        run: gcloud auth configure-docker asia-east1-docker.pkg.dev
+
+      - name: Docker Build Image
+        run: docker build -f Dockerfile -t asia-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ env.RELEASE_VERSION }} -t asia-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:latest .
+
+      - name: Docker Push Image
+        run: docker push asia-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }} --all-tags
+
+      - name: Deploy To Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image asia-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ env.RELEASE_VERSION }} \
+            --region asia-east1 \
+            --platform managed \
+            --allow-unauthenticated
