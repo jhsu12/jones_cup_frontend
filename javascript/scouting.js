@@ -1,6 +1,6 @@
-let translations, scoutingData, teams, mockData, averagePace;
+let translations, scoutingData, teams, playerData;
 
-let fourFactorsChart, playerEngineChart, playerStyleChart;
+let fourFactorsChart, playerEngineChart;
 let currentLang = 'en';
 
 const pe_statOptions = [
@@ -18,11 +18,9 @@ function initializeCharts() {
     const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
     const radarOptions = { ...chartOptions, scales: { r: { suggestedMin: 0, suggestedMax: 100, grid: { color: 'rgba(0,0,0,0.05)' }, pointLabels: { font: { size: 10 } }, ticks: { display: false } } }, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } } };
     const barOptions = { ...chartOptions, scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }, plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } } };
-    const horizontalBarOptions = { ...barOptions, indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true } } };
 
     fourFactorsChart = new Chart(document.getElementById('fourFactorsChart'), { type: 'radar', data: { labels: ['eFG%', 'TOV%', 'ORB%', 'FT Rate'], datasets: [{}, {}] }, options: radarOptions });
     playerEngineChart = new Chart(document.getElementById('playerEngineChart'), { type: 'bar', data: { labels: [], datasets: [{}, {}] }, options: barOptions });
-    playerStyleChart = new Chart(document.getElementById('playerStyleChart'), { type: 'bar', data: { labels: [], datasets: [{}, {}, {}] }, options: horizontalBarOptions });
 }
 
 function updateDashboard(teamName, isAllTeams) {
@@ -48,10 +46,6 @@ function updateDashboard(teamName, isAllTeams) {
         playerEngineChart.data.datasets = [];
         playerEngineChart.update();
 
-        playerStyleChart.data.labels = [];
-        playerStyleChart.data.datasets = [];
-        playerStyleChart.update();
-
         dashboard.classList.remove('loading');
         return;
     }
@@ -72,12 +66,6 @@ function updateDashboard(teamName, isAllTeams) {
         playerEngineChart.data.datasets[0] = { label: 'USG%', data: topPlayers.map(p => p.usg), backgroundColor: brilliantBlues[0] };
         playerEngineChart.data.datasets[1] = { label: 'TS%', data: topPlayers.map(p => p.ts), backgroundColor: brilliantBlues[3] };
         playerEngineChart.update();
-
-        playerStyleChart.data.labels = topPlayers.map(p => p.name);
-        playerStyleChart.data.datasets[0] = { label: '2PA%', data: topPlayers.map(p => p.style['2PA']), backgroundColor: brilliantBlues[0] };
-        playerStyleChart.data.datasets[1] = { label: '3PA%', data: topPlayers.map(p => p.style['3PA']), backgroundColor: brilliantBlues[1] };
-        playerStyleChart.data.datasets[2] = { label: 'FTA%', data: topPlayers.map(p => p.style['FTA']), backgroundColor: brilliantBlues[2] };
-        playerStyleChart.update();
 
         d3.selectAll(".team-circle").classed("selected", false).transition().duration(200).attr("r", 15);
         d3.select(`#circle-${teamName}`).classed("selected", true).raise().transition().duration(200).attr("r", 20);
@@ -100,8 +88,8 @@ function drawEfficiencyChart() {
 
     const svg = chartContainer.append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 ${bounds.width} ${height + margin.top + margin.bottom}`);
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-    const xScale = d3.scaleLinear().domain([95, 125]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([125, 95]).range([height, 0]);
+    const xScale = d3.scaleLinear().domain([d3.min(teams, d => d.offense) - 5, d3.max(teams, d => d.offense) + 5]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([d3.max(teams, d => d.defense) + 5, d3.min(teams, d => d.defense) - 5]).range([height, 0]);
     const avgOffense = d3.mean(teams, d => d.offense);
     const avgDefense = d3.mean(teams, d => d.defense);
     g.append("g").attr("class", "grid").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5).tickSize(-height).tickFormat("")).selectAll("line").attr("class", "grid-line");
@@ -112,40 +100,6 @@ function drawEfficiencyChart() {
     const domain = xScale.domain();
     const angle = Math.atan2(yScale(domain[1]) - yScale(domain[0]), xScale(domain[1]) - xScale(domain[0])) * 180 / Math.PI;
 
-    // y = x line
-    g.append("line")
-        .attr("x1", xScale(domain[0]))
-        .attr("y1", yScale(domain[0]))
-        .attr("x2", xScale(domain[1]))
-        .attr("y2", yScale(domain[1]))
-        .style("stroke", "grey")
-        .style("stroke-width", 1)
-        .style("stroke-dasharray", "5,5");
-
-    const textGroup = g.append("g")
-        .attr("transform", `translate(${xScale(98)}, ${yScale(98)}) rotate(${angle})`);
-
-    textGroup.append("text")
-        .attr("y", -5)
-        .style("font-size", "10px")
-        .style("fill", "grey")
-        .attr("text-anchor", "middle")
-        .text("Positive Teams");
-
-    textGroup.append("line")
-        .attr("x1", -30)
-        .attr("x2", 30)
-        .attr("y1", 0)
-        .attr("y2", 0)
-        .style("stroke", "grey")
-        .style("stroke-width", 0.5);
-
-    textGroup.append("text")
-        .attr("y", 10)
-        .style("font-size", "10px")
-        .style("fill", "grey")
-        .attr("text-anchor", "middle")
-        .text("Negative Teams");
     g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5));
     g.append("g").attr("class", "axis").call(d3.axisLeft(yScale).ticks(5));
     svg.append("text").attr("class", "axis-label").attr("x", margin.left + width / 2).attr("y", height + margin.top + 35).style("text-anchor", "middle").style("font-size", "12px").text("Offensive Rating");
@@ -155,7 +109,7 @@ function drawEfficiencyChart() {
     defs.selectAll(".team-pattern").data(teams).enter().append("pattern").attr("id", (d) => `logo-${d.name}`).attr("width", 1).attr("height", 1).attr("patternContentUnits", "objectBoundingBox").append("image").attr("xlink:href", d => d.logoUrl).attr("width", 1).attr("height", 1).attr("preserveAspectRatio", "xMidYMid slice");
     g.selectAll(".team-circle").data(teams).enter().append("circle").attr("class", "team-circle").attr("id", d => `circle-${d.name}`).attr("cx", d => xScale(d.offense)).attr("cy", d => yScale(d.defense)).attr("r", 15).attr("fill", d => `url(#logo-${d.name})`).on("mouseover", function(event, d) {
         d3.select(this).raise().transition().duration(200).attr("r", 18);
-        tooltip.style("opacity", 1).html(`<strong>${d.name}</strong><br/>Off: ${d.offense}<br/>Def: ${d.defense}`).style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 10) + "px");
+        tooltip.style("opacity", 1).html(`<strong>${d.name}</strong><br/>Off: ${d.offense.toFixed(1)}<br/>Def: ${d.defense.toFixed(1)}`).style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 10) + "px");
     }).on("mouseout", function(event, d) {
         if (!d3.select(this).classed("selected")) { d3.select(this).transition().duration(200).attr("r", 15); }
         tooltip.style("opacity", 0);
@@ -175,27 +129,52 @@ const pe_grid = pe_chart.append("g").attr("class", "pe-grid");
 const pe_tooltip = d3.select("#pe-tooltip");
 
 function initializePlayerExplorer() {
-    pe_averagedData = mockData;
+    pe_averagedData = playerData;
     const teamFilter = d3.select("#pe-team-filter");
-    const playerFilter = d3.select("#pe-player-filter"), xAxisSelect = d3.select("#x-axis-select"), yAxisSelect = d3.select("#y-axis-select");
+    const playerFilter = d3.select("#pe-player-filter"),
+        xAxisSelect = d3.select("#x-axis-select"),
+        yAxisSelect = d3.select("#y-axis-select"),
+        positionFilter = d3.select("#pe-position-filter");
 
     const teamNames = ["All", ...Object.keys(scoutingData)];
     teamFilter.selectAll("option").data(teamNames).enter().append("option").text(d => d === 'All' ? translations[currentLang]["all-teams"] : d).attr("value", d => d).attr("data-translate", d => d === 'All' ? 'all-teams' : `team-${d.toLowerCase()}`);
 
-    const players = ["All", ...new Set(pe_averagedData.map(d => d.player))];
-    playerFilter.selectAll("option").data(players).enter().append("option").text(d => d === 'All' ? translations[currentLang]["all-players"] : d).attr("value", d => d).attr("data-translate", d => d === 'All' ? 'all-players' : `player-${d.toLowerCase().replace(/\./g, "").replace(/\s/g, "-")}`);
-    
+    const positions = ["All", ...new Set(pe_averagedData.map(d => d.position))];
+    positionFilter.selectAll("option").data(positions).enter().append("option").text(d => d === 'All' ? "All Positions" : d).attr("value", d => d);
+
     xAxisSelect.selectAll('option').data(pe_statOptions).enter().append('option').text(d => translations[currentLang][d.label]).attr('value', d => d.value).attr('data-translate', d => d.label);
     yAxisSelect.selectAll('option').data(pe_statOptions).enter().append('option').text(d => translations[currentLang][d.label]).attr('value', d => d.value).attr('data-translate', d => d.label);
-    
+
     xAxisSelect.property('value', 'usg');
     yAxisSelect.property('value', 'ts_pct');
 
-    teamFilter.on("change", updatePlayerExplorer);
-    playerFilter.on("change", updatePlayerExplorer); 
-    xAxisSelect.on("change", updatePlayerExplorer); 
+    teamFilter.on("change", () => {
+        updatePlayerFilter();
+        updatePlayerExplorer();
+    });
+    playerFilter.on("change", updatePlayerExplorer);
+    positionFilter.on("change", updatePlayerExplorer);
+    xAxisSelect.on("change", updatePlayerExplorer);
     yAxisSelect.on("change", updatePlayerExplorer);
+
+    updatePlayerFilter();
 }
+
+function updatePlayerFilter() {
+    const selectedTeam = d3.select("#pe-team-filter").property("value");
+    const playerFilter = d3.select("#pe-player-filter");
+    
+    let players;
+    if (selectedTeam === "All") {
+        players = ["All", ...new Set(pe_averagedData.map(d => d.player))];
+    } else {
+        players = ["All", ...new Set(pe_averagedData.filter(d => d.team === selectedTeam).map(d => d.player))];
+    }
+
+    playerFilter.selectAll("option").remove();
+    playerFilter.selectAll("option").data(players).enter().append("option").text(d => d === 'All' ? translations[currentLang]["all-players"] : d).attr("value", d => d).attr("data-translate", d => d === 'All' ? 'all-players' : `player-${d.toLowerCase().replace(/\./g, "").replace(/\s/g, "-")}`);
+}
+
 
 function updatePlayerExplorer() {
     const chartArea = d3.select("#player-explorer-chart-area").node();
@@ -203,14 +182,20 @@ function updatePlayerExplorer() {
     pe_height = 500 - pe_margin.top - pe_margin.bottom;
     pe_svg.attr("width", pe_width + pe_margin.left + pe_margin.right).attr("height", 500);
     const selectedTeam = d3.select("#pe-team-filter").property("value");
-    const selectedPlayer = d3.select("#pe-player-filter").property("value"), xVal = d3.select("#x-axis-select").property("value"), yVal = d3.select("#y-axis-select").property("value");
-    
+    const selectedPlayer = d3.select("#pe-player-filter").property("value"),
+        selectedPosition = d3.select("#pe-position-filter").property("value"),
+        xVal = d3.select("#x-axis-select").property("value"),
+        yVal = d3.select("#y-axis-select").property("value");
+
     let filteredData = pe_averagedData;
     if (selectedTeam !== "All") {
         filteredData = filteredData.filter(d => d.team === selectedTeam);
     }
-    if (selectedPlayer !== "All") { 
-        filteredData = filteredData.filter(d => d.player === selectedPlayer); 
+    if (selectedPosition !== "All") {
+        filteredData = filteredData.filter(d => d.position === selectedPosition);
+    }
+    if (selectedPlayer !== "All") {
+        filteredData = filteredData.filter(d => d.player === selectedPlayer);
     }
 
     const x = d3.scaleLinear().domain([0, d3.max(filteredData, d => d[xVal]) * 1.1 || 10]).range([0, pe_width]);
@@ -284,7 +269,7 @@ function setLanguage(lang) {
 }
 
 function main() {
-    averagePace = (Object.values(scoutingData).reduce((sum, team) => sum + team.pace, 0) / Object.keys(scoutingData).length).toFixed(1);
+    averagePace = (Object.values(scoutingData).reduce((sum, team) => sum + parseFloat(team.pace), 0) / Object.keys(scoutingData).length).toFixed(1);
 
     const landscapeFilter = document.getElementById('team-filter');
     const languageSwitcher = document.getElementById('language-switcher');
@@ -307,6 +292,7 @@ function main() {
     drawEfficiencyChart();
     initializeCharts();
     initializePlayerExplorer();
+    updatePlayerFilter();
     updatePlayerExplorer();
     updateDashboard(null, true);
     
@@ -334,16 +320,65 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const cacheBuster = `v=${Date.now()}`;
     Promise.all([
-        fetch('json/mock_data/translations.json').then(response => response.json()),
-        fetch('json/mock_data/scoutingData.json').then(response => response.json()),
-        fetch('json/mock_data/teams.json').then(response => response.json()),
-        fetch('json/mock_data/playerData.json').then(response => response.json())
-    ]).then(([translationsData, scoutingDataData, teamsData, playerData]) => {
+        fetch(`json/mock_data/translations.json?${cacheBuster}`).then(response => response.json()),
+        fetch(`https://storage.googleapis.com/jones_cup/json/women/all_team_stats.json?${cacheBuster}`).then(response => response.json()),
+        fetch(`https://storage.googleapis.com/jones_cup/json/women/all_player_stats.json?${cacheBuster}`).then(response => response.json())
+    ]).then(([translationsData, allTeamStats, allPlayerStats]) => {
         translations = translationsData;
-        scoutingData = scoutingDataData;
-        teams = teamsData;
-        mockData = playerData;
+
+        // This handles both array and object-of-objects formats
+        const allTeamStatsArray = Object.entries(allTeamStats);
+        const allPlayerStatsArray = Array.isArray(allPlayerStats) ? allPlayerStats : Object.values(allPlayerStats);
+
+        const teamMap = new Map(allTeamStatsArray.map(team => [Number(team[0]), team[1].team_info.name]));
+
+        teams = allTeamStatsArray.map(team => {
+            team = team[1];
+            return {
+                name: team.team_info.name,
+                logoUrl: team.team_info.logoUrl,
+                offense: team.adv_stats.OffensiveRating,
+                defense: team.adv_stats.DefensiveRating,
+            };
+        });
+
+        scoutingData = allTeamStatsArray.reduce((acc, [teamId, team]) => {
+            acc[team.team_info.name] = {
+                pace: team.adv_stats.Pace.toFixed(1),
+                fourFactors: {
+                    offense: [team.adv_stats.eFG * 100, team.adv_stats.TOV * 100, team.adv_stats.ORP * 100, team.adv_stats.FTR * 100],
+                    defense: [team.adv_stats["Op-eFG"] * 100, team.adv_stats["Op-TOV"] * 100, team.adv_stats["Op-ORP"] * 100, team.adv_stats["Op-FTR"] * 100]
+                },
+                players: allPlayerStatsArray
+                    .filter(p => p.personalInfo.squad_id === Number(teamId))
+                    .map(p => ({
+                        name: p.personalInfo.name,
+                        usg: p.adv_stats["USG%"] || 0,
+                        ts: p.adv_stats["TS%"] || 0
+                    }))
+            };
+            return acc;
+        }, {});
+
+        playerData = allPlayerStatsArray.map(p => ({
+            player: p.personalInfo.name,
+            team: teamMap.get(p.personalInfo.squad_id),
+            position: p.personalInfo.position,
+            avatarUrl: p.personalInfo.avatarUrl,
+            pts: p.adv_stats['average-points'] || 0,
+            ast: p.adv_stats['average-assists'] || 0,
+            reb: p.adv_stats['average-rebounds'] || 0,
+            usg: p.adv_stats['USG%'] || 0,
+            ts_pct: p.adv_stats['TS%'] || 0,
+            fga: p.adv_stats.FGA || 0,
+            '3pa': p.adv_stats['3PA'] || 0,
+            tov: p.adv_stats.TOV || 0
+        }));
+
         main();
+    }).catch(error => {
+        console.error("Error loading data:", error);
     });
 });
