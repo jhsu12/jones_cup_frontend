@@ -1,7 +1,0 @@
-[
-    { "name": "Warriors", "offense": 120.2, "defense": 113.8, "net": 7, "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/cdd5dbcf6e4e40d3c6fa1dc556ec4b78e4cabfbb4dfddd80a05990bdaea9b42b" },
-    { "name": "Clippers", "offense": 112.3, "defense": 103.5, "net": 9, "logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/9e78de903e7fdb8b2458011575cdd087b600fcac61ac94dbca3642f7b4f7f8e9" },
-    { "name": "Thunder", "offense": 111.1, "defense": 99.2, "net": 12,"logoUrl": "https://storage.googleapis.com/p-xc-m/event/416/squads/c2be655be99db096194132a6f3f509afcc98e3a38f48a3295ccd0002cf2fa6c9" },
-    { "name": "Celtics", "offense": 108.9, "defense": 98.5, "net": 10,"logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/d8c35320ae26ede7e2650a0796fff6d6953f9ade0248f611c83026ffc279a25d" },
-    { "name": "Lakers", "offense": 99.2, "defense": 103.1, "net":-4, "logoUrl": "https://storage.googleapis.com/p-xc-m/event/417/squads/66c8691d2debaaeabd22fe90dd73ca5da9033778ad0e98048e366118bae57ba2"}
-]
