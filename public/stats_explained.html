@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Stat Explanations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-black text-[#003F5C] tracking-tight text-center mb-8">Advanced Stat Glossary</h1>
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">3-Point Attempts (3PA)</h2>
+                <p class="mb-4">The number of 3-point field goals a player has attempted.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">3-Point Percentage (3P%)</h2>
+                <p class="mb-4">The percentage of 3-point field goals a player makes.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 3P / 3PA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">3-Point Attempt Rate (3PA%)</h2>
+                <p class="mb-4">The percentage of a player's field goal attempts that are 3-point attempts.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 3PA / FGA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">2-Point Percentage (2P%)</h2>
+                <p class="mb-4">The percentage of 2-point field goals a player makes.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 2P / 2PA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">2-Point Attempt Rate (2PA%)</h2>
+                <p class="mb-4">The percentage of a player's field goal attempts that are 2-point attempts.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 2PA / FGA </p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Assist Percentage (AST%)</h2>
+                <p class="mb-4">An estimate of the percentage of teammate field goals a player assisted while they were on the floor.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 100 * AST / (((MP / (Team MP / 5)) * Team FG) - FG)</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Assist to Turnover Ratio (AST/TOV)</h2>
+                <p class="mb-4">The number of assists a player has for every turnover they commit.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: AST / TOV</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Assists (ast)</h2>
+                <p class="mb-4">The average number of assists a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Blocks (blk)</h2>
+                <p class="mb-4">The average number of blocks a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Points (pts)</h2>
+                <p class="mb-4">The average number of points a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Rebounds (reb)</h2>
+                <p class="mb-4">The average number of rebounds a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Steals (stl)</h2>
+                <p class="mb-4">The average number of steals a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Average Turnovers (tov)</h2>
+                <p class="mb-4">The average number of turnovers a player has per game.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Effective Field Goal Percentage (eFG%)</h2>
+                <p class="mb-4">Adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: (FG + 0.5 * 3P) / FGA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Field Goal Attempts (fga)</h2>
+                <p class="mb-4">The number of field goals a player has attempted.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Field Goal Percentage (FG%)</h2>
+                <p class="mb-4">The percentage of field goals a player makes.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: FG / FGA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Free Throw Percentage (FT%)</h2>
+                <p class="mb-4">The percentage of free throws a player makes.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: FT / FTA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Free Throw Attempt Rate (FTA%)</h2>
+                <p class="mb-4">The number of free throw attempts per field goal attempt.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: FTA / FGA</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Games Played (GP)</h2>
+                <p class="mb-4">The number of games a player has played in.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Offensive Rebound Percentage (OREB%)</h2>
+                <p class="mb-4">An estimate of the percentage of available offensive rebounds a player grabbed while they were on the floor.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 100 * (OREB * (Team MP / 5)) / (MP * (Team OREB + Opponent DREB))</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Defensive Rebound Percentage (DREB%)</h2>
+                <p class="mb-4">An estimate of the percentage of available defensive rebounds a player grabbed while they were on the floor.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 100 * (DREB * (Team MP / 5)) / (MP * (Team DREB + Opponent OREB))</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Total Rebound Percentage (TREB%)</h2>
+                <p class="mb-4">An estimate of the percentage of available rebounds a player grabbed while they were on the floor.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 100 * (TRB * (Team MP / 5)) / (MP * (Team TRB + Opponent TRB))</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">True Shooting Percentage (ts_pct)</h2>
+                <p class="mb-4">A measure of shooting efficiency that takes into account field goals, 3-point field goals, and free throws.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: PTS / (2 * (FGA + 0.44 * FTA))</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-[#2F4B7C] mb-2">Usage Rate (usg)</h2>
+                <p class="mb-4">An estimate of the percentage of team plays used by a player while they were on the floor.</p>
+                <p class="font-mono bg-gray-200 p-4 rounded">Formula: 100 * ((FGA + 0.44 * FTA + TOV) * (Team MP / 5)) / (MP * (Team FGA + 0.44 * Team FTA + Team TOV))</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

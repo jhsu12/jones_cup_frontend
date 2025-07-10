@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Scouting Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style/scouting.css">
+    <link rel="stylesheet" href="style/shot_chart.css">
+</head>
+<body class="text-gray-800">
+    <div class="container mx-auto p-4">
+        <header class="relative mb-8">
+            <div class="flex justify-between items-center">
+                <div class="flex-1"></div>
+                <h1 class="flex-1 text-3xl md:text-4xl font-black text-[#003F5C] tracking-tight text-center" data-translate="main-title">Advanced Stats Explorer <span class="text-sm bg-orange-300 text-orange-800 px-2 py-1 rounded-full">Beta</span></h1>
+                <div class="flex-1 text-right">
+                    <div id="language-switcher-container" class="inline-block mt-4 mr-4">
+                        <select id="language-switcher" class="pe-select bg-white border border-gray-300 rounded-md shadow-sm p-2">
+                            <option value="en">English</option>
+                            <option value="zh-TW">繁體中文</option>
+                            <option value="ko">한국어</option>
+                            <option value="ja">日本語</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-xs mx-auto mt-4">
+                <label for="team-filter" class="sr-only" data-translate="team-filter-label">Select a Team</label>
+                <select id="team-filter" class="block w-full p-2 text-base border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></select>
+                <p id="team-selection-prompt" class="text-gray-500 mt-2" style="display: none;" data-translate="team-selection-prompt"></p>
+            </div>
+        </header>
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 chart-card">
+                <h2 class="text-xl font-bold text-center text-[#003F5C] mb-2" data-translate="team-efficiency-landscape">Team Efficiency Landscape</h2>
+                <div id="chart" class="efficiency-chart-container"></div>
+                <div class="tooltip" id="tooltip"></div>
+            </div>
+            <div id="team-dashboard" class="lg:col-span-1 space-y-4 data-card">
+                <div class="chart-card text-center">
+                    <h3 class="text-lg font-bold text-[#2F4B7C]" data-translate="game-tempo">Game Tempo</h3>
+                    <div class="flex items-baseline justify-center space-x-2">
+                        <p id="pace-value" class="text-7xl font-black text-[#FFA600]"></p>
+                        <p id="average-pace-value" class="text-2xl font-bold text-gray-400"></p>
+                    </div>
+                    <p class="text-sm text-gray-600 font-semibold" data-translate="pace-label">Pace (Possessions per 40 min)</p>
+                </div>
+                <div class="chart-card"><h3 class="text-lg font-bold text-center text-[#2F4B7C] mb-2" data-translate="four-factors-profile">Four Factors Profile</h3><div class="chart-container-sm"><canvas id="fourFactorsChart"></canvas></div></div>
+                <div class="chart-card">
+                    <h3 class="text-lg font-bold text-center text-[#665191] mb-2" data-translate="team-style">Team Shot Attempt Chart</h3>
+                    <div class="shot-chart-court-container">
+                        <svg id="shot-attempt-chart" viewBox="0 0 500 470"></svg>
+                    </div>
+                </div>
+                <div class="chart-card"><h3 class="text-lg font-bold text-center text-[#665191] mb-2" data-translate="offensive-engine">Offensive Engine</h3><p class="text-sm text-center text-gray-500 -mt-2 mb-2" data-translate="offensive-engine-subtitle">(Top 3 by Usage %)</p><div class="chart-container-sm"><canvas id="playerEngineChart"></canvas></div></div>
+            </div>
+        </main>
+        <section class="mt-8">
+             <div class="chart-card">
+                <h2 class="text-xl font-bold text-center text-[#003F5C] mb-2" data-translate="interactive-player-stat-explorer">Interactive Player Stat Explorer</h2>
+                <div class="text-center mb-4">
+                    <a href="stats_explained.html" target="_blank" class="text-sm text-blue-500 underline" data-translate="stats-glossary-link">Advanced Stats Glossary</a>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
+                    <div><label for="pe-team-filter" class="block text-sm control-label mb-1" data-translate="team-label">Team</label><select id="pe-team-filter" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                    <div><label for="pe-player-filter" class="block text-sm control-label mb-1" data-translate="player-label">Player</label><select id="pe-player-filter" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"><option value="All">All Players</option></select></div>
+                    <div><label for="pe-position-filter" class="block text-sm control-label mb-1" data-translate="position-label">Position</label><select id="pe-position-filter" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"><option value="All">All Positions</option></select></div>
+                    <div><label for="x-axis-select" class="block text-sm control-label mb-1" data-translate="x-axis-label">X-Axis</label><select id="x-axis-select" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                    <div><label for="y-axis-select" class="block text-sm control-label mb-1" data-translate="y-axis-label">Y-Axis</label><select id="y-axis-select" class="pe-select block w-full bg-gray-50 border border-gray-300 rounded-md shadow-sm p-2"></select></div>
+                </div>
+                <div id="player-explorer-chart-area" class="w-full h-[500px]"></div>
+            </div>
+        </section>
+    </div>
+    <div id="pe-tooltip" class="pe-tooltip"></div>
+    <script src="javascript/scouting.js"></script>
+    <script src="javascript/shot_chart.js"></script>
+</body>
+</html>
