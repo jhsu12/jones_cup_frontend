@@ -6,9 +6,7 @@ let currentLang = 'en';
 const pe_statOptions = [
     { value: '3PA', label: 'stat-3pa' },
     { value: '3P%', label: 'stat-3p_pct' },
-    { value: '3PA%', label: 'stat-3pa_pct' },
     { value: 'twoPointersPercentage', label: 'stat-2p_pct' },
-    { value: '2PA%', label: 'stat-2pa_pct' },
     { value: 'AST%', label: 'stat-ast_pct' },
     { value: 'AST/TOV', label: 'stat-ast_tov' },
     { value: 'ast', label: 'stat-average-ast' },
@@ -21,7 +19,6 @@ const pe_statOptions = [
     { value: 'fga', label: 'stat-fga' },
     { value: 'FG%', label: 'stat-fg_pct' },
     { value: 'FT%', label: 'stat-ft_pct' },
-    { value: 'FTA%', label: 'stat-fta_pct' },
     { value: 'GP', label: 'stat-gp' },
     { value: 'OREB%', label: 'stat-oreb_pct' },
     { value: 'DREB%', label: 'stat-dreb_pct' },
@@ -88,7 +85,7 @@ function updateDashboard(teamName, isAllTeams) {
         drawShotChart(data.shotData, "#shot-attempt-chart");
 
         d3.selectAll(".team-circle").classed("selected", false).transition().duration(200).attr("r", 15);
-        d3.select(`#circle-${teamName}`).classed("selected", true).raise().transition().duration(200).attr("r", 20);
+        d3.select(`#circle-${teamName.replace(/\s/g, '-')}`).classed("selected", true).raise().transition().duration(200).attr("r", 20);
         
         dashboard.classList.remove('loading');
     }, 300);
@@ -126,8 +123,8 @@ function drawEfficiencyChart() {
     svg.append("text").attr("class", "axis-label").attr("transform", "rotate(-90)").attr("y", 15).attr("x", -(margin.top + height / 2)).style("text-anchor", "middle").style("font-size", "12px").text("Defensive Rating");
     const tooltip = d3.select("#tooltip");
     const defs = g.append("defs");
-    defs.selectAll(".team-pattern").data(teams).enter().append("pattern").attr("id", (d) => `logo-${d.name}`).attr("width", 1).attr("height", 1).attr("patternContentUnits", "objectBoundingBox").append("image").attr("xlink:href", d => d.logoUrl).attr("width", 1).attr("height", 1).attr("preserveAspectRatio", "xMidYMid slice");
-    g.selectAll(".team-circle").data(teams).enter().append("circle").attr("class", "team-circle").attr("id", d => `circle-${d.name}`).attr("cx", d => xScale(d.offense)).attr("cy", d => yScale(d.defense)).attr("r", 15).attr("fill", d => `url(#logo-${d.name})`).on("mouseover", function(event, d) {
+    defs.selectAll(".team-pattern").data(teams).enter().append("pattern").attr("id", (d) => `logo-${d.name.replace(/\s/g, '-')}`).attr("width", 1).attr("height", 1).attr("patternContentUnits", "objectBoundingBox").append("image").attr("xlink:href", d => d.logoUrl).attr("width", 1).attr("height", 1).attr("preserveAspectRatio", "xMidYMid slice");
+    g.selectAll(".team-circle").data(teams).enter().append("circle").attr("class", "team-circle").attr("id", d => `circle-${d.name.replace(/\s/g, '-')}`).attr("cx", d => xScale(d.offense)).attr("cy", d => yScale(d.defense)).attr("r", 15).attr("fill", d => `url(#logo-${d.name.replace(/\s/g, '-')})`).on("mouseover", function(event, d) {
         d3.select(this).raise().transition().duration(200).attr("r", 18);
         tooltip.style("opacity", 1).html(`<strong>${d.name}</strong><br/>Off: ${d.offense.toFixed(1)}<br/>Def: ${d.defense.toFixed(1)}`).style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 10) + "px");
     }).on("mouseout", function(event, d) {
